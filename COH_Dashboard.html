@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community of Hope — Metrics Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy:   #1a2b4a;
+    --blue:   #2563eb;
+    --teal:   #0d9488;
+    --amber:  #d97706;
+    --rose:   #e11d48;
+    --purple: #7c3aed;
+    --slate:  #475569;
+    --light:  #f1f5f9;
+    --white:  #ffffff;
+    --border: #e2e8f0;
+    --green:  #16a34a;
+    --orange: #ea580c;
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--light); color: #1e293b; }
+
+  /* ── HEADER ───────────────────────────────────────────────────────── */
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .logo-circle {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: white; letter-spacing: -1px;
+  }
+  .header-title { font-size: 20px; font-weight: 700; }
+  .header-sub   { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+  .header-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .year-btn {
+    padding: 7px 18px; border-radius: 20px; border: 2px solid rgba(255,255,255,0.25);
+    background: transparent; color: white; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .18s;
+  }
+  .year-btn.active  { background: var(--blue); border-color: var(--blue); }
+  .year-btn:hover:not(.active) { background: rgba(255,255,255,0.1); }
+  .last-updated { font-size: 12px; color: #64748b; }
+
+  /* ── TABS ────────────────────────────────────────────────────────── */
+  .tab-bar {
+    background: white; border-bottom: 1px solid var(--border);
+    display: flex; padding: 0 32px; gap: 4px;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 14px 20px; font-size: 13px; font-weight: 600; color: var(--slate);
+    border: none; background: none; cursor: pointer;
+    border-bottom: 3px solid transparent; white-space: nowrap; transition: all .18s;
+  }
+  .tab.active   { color: var(--blue); border-bottom-color: var(--blue); }
+  .tab:hover:not(.active) { color: var(--navy); }
+
+  /* ── LAYOUT ─────────────────────────────────────────────────────── */
+  .page { display: none; padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ── KPI CARDS ────────────────────────────────────────────────────  */
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .kpi-card {
+    background: white; border-radius: 12px; padding: 20px 22px;
+    box-shadow: var(--card-shadow); border-top: 4px solid var(--blue);
+    position: relative; overflow: hidden;
+  }
+  .kpi-card.teal   { border-top-color: var(--teal); }
+  .kpi-card.amber  { border-top-color: var(--amber); }
+  .kpi-card.purple { border-top-color: var(--purple); }
+  .kpi-card.rose   { border-top-color: var(--rose); }
+  .kpi-card.green  { border-top-color: var(--green); }
+  .kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--slate); }
+  .kpi-value { font-size: 30px; font-weight: 800; color: var(--navy); margin: 6px 0 4px; line-height: 1; }
+  .kpi-sub   { font-size: 12px; color: var(--slate); }
+  .kpi-change { font-size: 12px; font-weight: 600; margin-top: 6px; }
+  .kpi-change.up   { color: var(--green); }
+  .kpi-change.down { color: var(--rose); }
+  .kpi-change.flat { color: var(--slate); }
+  .kpi-icon { position: absolute; right: 16px; top: 16px; font-size: 22px; opacity: .15; }
+
+  /* ── CARDS ────────────────────────────────────────────────────────  */
+  .card { background: white; border-radius: 12px; padding: 24px; box-shadow: var(--card-shadow); margin-bottom: 20px; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 4px; }
+  .card-sub   { font-size: 12px; color: var(--slate); margin-bottom: 18px; }
+  .chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  @media(max-width:900px) { .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; } }
+  .chart-wrap { position: relative; }
+  canvas { max-height: 280px; }
+
+  /* ── MAPS FRAMEWORK ──────────────────────────────────────────────── */
+  .maps-funnel { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+  @media(max-width:900px) { .maps-funnel { grid-template-columns: 1fr 1fr; } }
+  .maps-stage {
+    border-radius: 12px; padding: 20px; color: white; position: relative; overflow: hidden;
+  }
+  .maps-stage.s1 { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .maps-stage.s2 { background: linear-gradient(135deg, #10b981, #059669); }
+  .maps-stage.s3 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .maps-stage.s4 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+  .maps-stage-icon { font-size: 28px; margin-bottom: 8px; }
+  .maps-stage-name { font-size: 16px; font-weight: 800; }
+  .maps-stage-desc { font-size: 11px; opacity: .8; margin-top: 2px; margin-bottom: 14px; }
+  .maps-metric { display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,.15); border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; }
+  .maps-metric-name  { font-size: 11px; font-weight: 600; }
+  .maps-metric-value { font-size: 16px; font-weight: 800; }
+
+  /* ── QUARTERLY TABLE ─────────────────────────────────────────────── */
+  .q-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .q-table th { background: var(--light); padding: 10px 14px; text-align: left; font-size: 11px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--slate);
+    border-bottom: 2px solid var(--border); }
+  .q-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .q-table tr:last-child td { border-bottom: none; }
+  .q-table tr:hover td { background: #f8fafc; }
+  .q-cat { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px;
+    color: white; padding: 2px 8px; border-radius: 10px; display: inline-block; }
+  .q-cat.dis  { background: var(--blue); }
+  .q-cat.int  { background: var(--green); }
+  .q-cat.grow { background: var(--amber); }
+  .q-cat.dev  { background: var(--purple); }
+  .q-val { font-weight: 700; color: var(--navy); }
+  .q-val.none { color: #cbd5e1; font-weight: 400; font-style: italic; }
+  .q-owner { font-size: 11px; color: var(--slate); }
+
+  /* ── SOCIAL MEDIA ────────────────────────────────────────────────── */
+  .social-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  @media(max-width:900px) { .social-grid { grid-template-columns: 1fr 1fr; } }
+  .social-card { background: var(--light); border-radius: 10px; padding: 16px; }
+  .social-platform { font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .7px; color: var(--slate); margin-bottom: 12px; }
+  .social-metric { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .social-metric-name  { font-size: 12px; color: var(--slate); }
+  .social-metric-value { font-size: 12px; font-weight: 700; color: var(--navy); }
+  .q-pill { display: inline-block; background: var(--light); border: 1px solid var(--border);
+    border-radius: 12px; padding: 3px 10px; font-size: 11px; font-weight: 600; color: var(--slate); margin-bottom: 10px; }
+
+  /* ── SECTION HEADER ──────────────────────────────────────────────── */
+  .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .section-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .section-label { font-size: 15px; font-weight: 700; color: var(--navy); }
+  .section-note  { font-size: 12px; color: var(--slate); margin-left: auto; }
+
+  /* ── CAMPUS LEGEND ───────────────────────────────────────────────── */
+  .legend-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--slate); }
+  .legend-dot  { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ HEADER ═══════════════════════════════ -->
+<header>
+  <div class="header-left">
+    <div class="logo-circle">COH</div>
+    <div>
+      <div class="header-title">Community of Hope — Metrics Dashboard</div>
+      <div class="header-sub">Weekly Attendance · Giving · MAPS Framework · Ministry</div>
+    </div>
+  </div>
+  <div class="header-controls">
+    <button class="year-btn active" onclick="setYear(2025)">2025</button>
+    <button class="year-btn" onclick="setYear(2026)">2026</button>
+    <span id="data-badge" style="font-size:11px; color:#94a3b8; margin-left:8px; white-space:nowrap;">⏳ Loading…</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════ TABS ════════════════════════════════ -->
+<div class="tab-bar">
+  <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
+  <button class="tab" onclick="showTab('attendance')">🏛️ Attendance</button>
+  <button class="tab" onclick="showTab('giving')">💰 Giving</button>
+  <button class="tab" onclick="showTab('maps')">🗺️ MAPS Framework</button>
+  <button class="tab" onclick="showTab('digital')">📱 Digital & Outreach</button>
+</div>
+
+<!-- ════════════════════════════════ PAGE: OVERVIEW ═════════════════════════ -->
+<div id="page-overview" class="page active">
+
+  <!-- KPIs -->
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <!-- Attendance trend -->
+  <div class="card">
+    <div class="card-title">Total Weekly Attendance — All Campuses Combined</div>
+    <div class="card-sub" id="att-trend-sub">Full year 2025 + 2026 YTD comparison</div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>2025</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>2026 (YTD)</div>
+    </div>
+    <canvas id="chartAttTrend" style="max-height:300px"></canvas>
+  </div>
+
+  <div class="chart-grid-2">
+    <!-- Offering trend -->
+    <div class="card">
+      <div class="card-title">Weekly Giving — All Campuses</div>
+      <div class="card-sub">Total offerings received per week</div>
+      <canvas id="chartOffTrend"></canvas>
+    </div>
+    <!-- Offering breakdown -->
+    <div class="card">
+      <div class="card-title">2025 Giving Breakdown by Fund</div>
+      <div class="card-sub">Total giving allocated by category</div>
+      <canvas id="chartOffDoughnut" style="max-height:240px"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ PAGE: ATTENDANCE ═══════════════════════ -->
+<div id="page-attendance" class="page">
+
+  <div class="kpi-row" id="kpi-att"></div>
+
+  <!-- Campus comparison -->
+  <div class="card">
+    <div class="card-title">Weekly Attendance by Campus</div>
+    <div class="card-sub" id="campus-sub">Loxahatchee vs. Lake Worth — weekly totals</div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Loxahatchee</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Lake Worth</div>
+    </div>
+    <canvas id="chartCampusWeekly" style="max-height:300px"></canvas>
+  </div>
+
+  <div class="chart-grid-2">
+    <!-- Service times -->
+    <div class="card">
+      <div class="card-title">Loxahatchee — Service Time Breakdown (2025)</div>
+      <div class="card-sub">Average attendance by service time</div>
+      <canvas id="chartServiceTimes"></canvas>
+    </div>
+    <!-- Ministry attendance -->
+    <div class="card">
+      <div class="card-title">Ministry Attendance Trends (2025)</div>
+      <div class="card-sub">Celebrate Recovery · Youth · Children · Online</div>
+      <canvas id="chartMinistry"></canvas>
+    </div>
+  </div>
+
+  <!-- Service time detail chart -->
+  <div class="card">
+    <div class="card-title">Loxahatchee — Weekly by Service Time (2025)</div>
+    <div class="card-sub">8:30 AM · 10:00 AM · 11:30 AM side-by-side</div>
+    <div class="legend-row">
+      <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>8:30 AM</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>10:00 AM</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>11:30 AM</div>
+    </div>
+    <canvas id="chartServiceLine" style="max-height:280px"></canvas>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ PAGE: GIVING ═══════════════════════════ -->
+<div id="page-giving" class="page">
+
+  <!-- Flourish Campaign Highlight -->
+  <div style="background: linear-gradient(135deg, #1a2b4a, #2563eb); color:white; border-radius:12px; padding:22px 28px; margin-bottom:24px; display:flex; align-items:center; gap:24px; flex-wrap:wrap;">
+    <div>
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; opacity:.7; margin-bottom:4px;">🎉 2024–2025 Flourish Campaign — Complete</div>
+      <div style="font-size:13px; opacity:.85; line-height:1.6;">Thank you to our church family. The 2-year Flourish Campaign funded debt reduction, our intern &amp; residency program, and major campus renovations at Loxahatchee and Lake Worth.</div>
+    </div>
+    <div style="display:flex; gap:28px; flex-wrap:wrap; flex-shrink:0;">
+      <div style="text-align:center;">
+        <div style="font-size:26px; font-weight:800;">$11.4M</div>
+        <div style="font-size:11px; opacity:.7;">Total Giving 2024–2025</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:26px; font-weight:800;">$5.1M</div>
+        <div style="font-size:11px; opacity:.7;">Expenses 2024–2025</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:26px; font-weight:800;">$1.47M</div>
+        <div style="font-size:11px; opacity:.7;">Net Surplus</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-row" id="kpi-giving"></div>
+
+  <div class="chart-grid-2">
+    <div class="card">
+      <div class="card-title">Weekly Giving — 2025 Full Year</div>
+      <div class="card-sub">Total offerings by week (all campuses combined)</div>
+      <canvas id="chartGiving25"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Weekly Giving — 2026 Trimester 1 (YTD)</div>
+      <div class="card-sub">T1: January – May 2026 (Jan–Feb data shown)</div>
+      <canvas id="chartGiving26"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-grid-2">
+    <div class="card">
+      <div class="card-title">Giving by Fund — 2025 Annual Total</div>
+      <div class="card-sub">How total giving was distributed across funds</div>
+      <canvas id="chartGivingFunds" style="max-height:300px"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Giving by Fund — Dollar Amounts</div>
+      <div class="card-sub">Bar chart of total per category (2025)</div>
+      <canvas id="chartGivingBar"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ PAGE: MAPS ══════════════════════════════ -->
+<div id="page-maps" class="page">
+
+  <div style="background:white; border-radius:12px; padding:18px 24px; margin-bottom:20px; border-left: 5px solid var(--blue); box-shadow: var(--card-shadow);">
+    <div style="font-size:14px; font-weight:700; color:var(--navy); margin-bottom:4px;">About the MAPS Framework</div>
+    <div style="font-size:13px; color:var(--slate); line-height:1.6;">
+      COH measures discipleship health through four stages of engagement:
+      <strong style="color:#2563eb">Disinterested</strong> → reaching those outside the church,
+      <strong style="color:#059669">Interested</strong> → engaging new visitors,
+      <strong style="color:#d97706">Growing Together</strong> → developing committed disciples,
+      <strong style="color:#7c3aed">Fully Devoted</strong> → equipping core leaders.
+      <br><br><span style="font-size:11px; color:#94a3b8;">📋 Stage totals and annual figures sourced from 2025 Annual Report. Quarterly figures from internal metrics sheet. 2026 reporting uses Trimester system: T1 (Jan–May) · T2 (Jun–Aug) · T3 (Sep–Dec).</span>
+    </div>
+  </div>
+
+  <!-- Stage cards -->
+  <div class="maps-funnel">
+    <div class="maps-stage s1">
+      <div class="maps-stage-icon">🌍</div>
+      <div class="maps-stage-name">Disinterested</div>
+      <div class="maps-stage-desc">Has a person responded to our reach towards them?</div>
+      <div class="maps-metric"><span class="maps-metric-name">Support Groups (annual)</span><span class="maps-metric-value">96</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Social Media Engagement</span><span class="maps-metric-value">—</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Community-Wide Events &amp; Gatherings</span><span class="maps-metric-value">—</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Servant Evangelism</span><span class="maps-metric-value">—</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Food Distributions (annual)</span><span class="maps-metric-value">14,821</span></div>
+      <div class="maps-metric" style="background:rgba(255,255,255,0.3); margin-top:10px; border-top:1px solid rgba(255,255,255,0.4);">
+        <span class="maps-metric-name" style="font-weight:800; text-transform:uppercase; letter-spacing:.5px; font-size:10px;">Total People Reached</span>
+        <span class="maps-metric-value" style="font-size:20px;">14,917</span>
+      </div>
+    </div>
+    <div class="maps-stage s2">
+      <div class="maps-stage-icon">👋</div>
+      <div class="maps-stage-name">Interested</div>
+      <div class="maps-stage-desc">Has a person taken a step towards us?</div>
+      <div class="maps-metric"><span class="maps-metric-name">Avg Weekly Attendance (all campuses)</span><span class="maps-metric-value">2,262</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Open House Attendance</span><span class="maps-metric-value">29</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Next Steps Forms</span><span class="maps-metric-value">11</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Digital Connect Cards (annual)</span><span class="maps-metric-value">210</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Welcome Bags</span><span class="maps-metric-value">—</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Alpha Attendance (annual)</span><span class="maps-metric-value">69</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Monday Connect (Q1–Q3)</span><span class="maps-metric-value">847</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">New Follows on Social</span><span class="maps-metric-value">165</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">App Downloads (annual)</span><span class="maps-metric-value">419</span></div>
+      <div class="maps-metric" style="background:rgba(255,255,255,0.3); margin-top:10px; border-top:1px solid rgba(255,255,255,0.4);">
+        <span class="maps-metric-name" style="font-weight:800; text-transform:uppercase; letter-spacing:.5px; font-size:10px;">Total Engaged</span>
+        <span class="maps-metric-value" style="font-size:20px;">3,972</span>
+      </div>
+    </div>
+    <div class="maps-stage s3">
+      <div class="maps-stage-icon">🌱</div>
+      <div class="maps-stage-name">Growing Together</div>
+      <div class="maps-stage-desc">Has a person taken a step of commitment?</div>
+      <div class="maps-metric"><span class="maps-metric-name">New Partners</span><span class="maps-metric-value">86</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Baptisms (annual)</span><span class="maps-metric-value">125</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">New Giving Units</span><span class="maps-metric-value">—</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">New Volunteers</span><span class="maps-metric-value">—</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Groups &amp; Course Attendance</span><span class="maps-metric-value">710</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Active Small Groups</span><span class="maps-metric-value">77</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">Freedom Course (annual)</span><span class="maps-metric-value">133</span></div>
+      <div class="maps-metric" style="background:rgba(255,255,255,0.3); margin-top:10px; border-top:1px solid rgba(255,255,255,0.4);">
+        <span class="maps-metric-name" style="font-weight:800; text-transform:uppercase; letter-spacing:.5px; font-size:10px;">Total Growing in Faith</span>
+        <span class="maps-metric-value" style="font-size:20px;">1,131</span>
+      </div>
+    </div>
+    <div class="maps-stage s4">
+      <div class="maps-stage-icon">🔥</div>
+      <div class="maps-stage-name">Fully Devoted</div>
+      <div class="maps-stage-desc">Has a person placed themselves in a relationship where they are spiritually, relationally and missionally accountable?</div>
+      <div class="maps-metric"><span class="maps-metric-name">Discipleship Bands</span><span class="maps-metric-value">53</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">COH YTH Leadership</span><span class="maps-metric-value">34</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">CR Sponsor Relationships</span><span class="maps-metric-value">21</span></div>
+      <div class="maps-metric"><span class="maps-metric-name">CR Step Studies</span><span class="maps-metric-value">42</span></div>
+      <div class="maps-metric" style="background:rgba(255,255,255,0.3); margin-top:10px; border-top:1px solid rgba(255,255,255,0.4);">
+        <span class="maps-metric-name" style="font-weight:800; text-transform:uppercase; letter-spacing:.5px; font-size:10px;">Total Leaders Serving</span>
+        <span class="maps-metric-value" style="font-size:20px;">150</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quarterly charts -->
+  <div class="chart-grid-2">
+    <div class="card">
+      <div class="card-title">Disinterested — Quarterly Metrics (2025)</div>
+      <div class="card-sub">Support groups + food distributions trend by quarter</div>
+      <canvas id="chartMapsD"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Interested — Digital Engagement Quarterly (2025)</div>
+      <div class="card-sub">Connect cards · Monday Connect · App downloads</div>
+      <canvas id="chartMapsI"></canvas>
+    </div>
+  </div>
+  <div class="chart-grid-2">
+    <div class="card">
+      <div class="card-title">Growing Together — Commitment Metrics (2025)</div>
+      <div class="card-sub">Partners, baptisms, groups &amp; courseship bands growth through Q1–Q3</div>
+      <canvas id="chartMapsG"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Fully Devoted — Leadership Engagement (2025)</div>
+      <div class="card-sub">Partners, baptisms, groups &amp; courseship Bands · YTH Leadership · CR Step Studies &amp; Sponsors</div>
+      <canvas id="chartMapsF"></canvas>
+    </div>
+  </div>
+
+  <!-- Full detail table -->
+  <div class="card">
+    <div class="card-title">2025 MAPS Metrics — Full Detail Table</div>
+    <div class="card-sub">All quarterly data points with responsible team member</div>
+    <table class="q-table">
+      <thead>
+        <tr>
+          <th>Stage</th>
+          <th>Metric</th>
+          <th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th>
+          <th style="background:#1a2b4a;color:white;">2025 Annual</th>
+          <th>Owner</th>
+        </tr>
+      </thead>
+      <tbody id="maps-table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ PAGE: DIGITAL ══════════════════════════ -->
+<div id="page-digital" class="page">
+
+  <div class="kpi-row">
+    <div class="kpi-card teal">
+      <div class="kpi-icon">📸</div>
+      <div class="kpi-label">IG Followers (2025)</div>
+      <div class="kpi-value">2,650</div>
+      <div class="kpi-sub">COH Main — +10% YoY</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-icon">▶️</div>
+      <div class="kpi-label">YT Views (2025 Annual)</div>
+      <div class="kpi-value">33,500</div>
+      <div class="kpi-sub">COH Main YouTube</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-icon">📺</div>
+      <div class="kpi-label">CR YT Views (2025)</div>
+      <div class="kpi-value">53,764</div>
+      <div class="kpi-sub">Celebrate Recovery channel</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-icon">📱</div>
+      <div class="kpi-label">New App Downloads</div>
+      <div class="kpi-value">419</div>
+      <div class="kpi-sub">New COH Mobile App 2025</div>
+    </div>
+    <div class="kpi-card rose">
+      <div class="kpi-icon">⏱️</div>
+      <div class="kpi-label">YT Hours Watched</div>
+      <div class="kpi-value">10,200</div>
+      <div class="kpi-sub">COH Main channel 2025</div>
+    </div>
+  </div>
+
+  <div class="chart-grid-2">
+    <div class="card">
+      <div class="card-title">Facebook — Quarterly Growth (2025)</div>
+      <div class="card-sub">Views, followers, and reactions by quarter</div>
+      <canvas id="chartFB"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">YouTube — Quarterly Growth (2025)</div>
+      <div class="card-sub">Views, subscribers, and video impressions</div>
+      <canvas id="chartYT"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Monday Connect Sign-ups (2025)</div>
+    <div class="card-sub">Quarterly digital engagement through Monday Connect platform</div>
+    <canvas id="chartMonConnect" style="max-height:200px"></canvas>
+  </div>
+
+  <!-- Ministry Highlights from Annual Report -->
+  <div class="card">
+    <div class="card-title">2025 Ministry Highlights — From Annual Report</div>
+    <div class="card-sub">Key ministry stats across COH YTH, COH Kids, and Missions</div>
+    <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:16px; margin-top:8px;">
+      <div style="background:var(--light); border-radius:10px; padding:16px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--slate); margin-bottom:12px;">✝️ COH Youth</div>
+        <div class="social-metric"><span class="social-metric-name">Avg Weekly Attendance</span><span class="social-metric-value">142</span></div>
+        <div class="social-metric"><span class="social-metric-name">Student Leaders</span><span class="social-metric-value">34</span></div>
+        <div class="social-metric"><span class="social-metric-name">YTH Baptisms</span><span class="social-metric-value">39</span></div>
+        <div class="social-metric"><span class="social-metric-name">YTH Camp Attendees</span><span class="social-metric-value">161</span></div>
+        <div class="social-metric"><span class="social-metric-name">Mission Hours Served</span><span class="social-metric-value">432</span></div>
+      </div>
+      <div style="background:var(--light); border-radius:10px; padding:16px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--slate); margin-bottom:12px;">👧 COH Kids</div>
+        <div class="social-metric"><span class="social-metric-name">Avg Weekly Attendance</span><span class="social-metric-value">179</span></div>
+        <div class="social-metric"><span class="social-metric-name">Volunteers</span><span class="social-metric-value">60</span></div>
+        <div class="social-metric"><span class="social-metric-name">New Families</span><span class="social-metric-value">277</span></div>
+        <div class="social-metric"><span class="social-metric-name">Mega Sports Camp Kids</span><span class="social-metric-value">343</span></div>
+        <div class="social-metric"><span class="social-metric-name">Camp Volunteers</span><span class="social-metric-value">164</span></div>
+      </div>
+      <div style="background:var(--light); border-radius:10px; padding:16px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--slate); margin-bottom:12px;">🌍 Missions &amp; Outreach</div>
+        <div class="social-metric"><span class="social-metric-name">Individuals Served (Food)</span><span class="social-metric-value">14,821</span></div>
+        <div class="social-metric"><span class="social-metric-name">Thanksgiving Distribution</span><span class="social-metric-value">1,236</span></div>
+        <div class="social-metric"><span class="social-metric-name">Homeless Served</span><span class="social-metric-value">2,132</span></div>
+        <div class="social-metric"><span class="social-metric-name">Garden of Hope Workshops</span><span class="social-metric-value">373 attended</span></div>
+        <div class="social-metric"><span class="social-metric-name">Global Missions Partners</span><span class="social-metric-value">10</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Digital & Outreach — All Metrics (2025 Annual)</div>
+    <div class="card-sub">Full social media and digital metrics breakdown by quarter</div>
+    <div class="social-grid">
+      <div class="social-card">
+        <div class="social-platform">📘 Facebook (Quarterly 2025)</div>
+        <div class="social-metric"><span class="social-metric-name">Views</span><span style="font-size:10px;color:#94a3b8">Q1: 65,667 → Q2: 90,238 → Q3: 67,963</span></div>
+        <div class="social-metric"><span class="social-metric-name">New Followers</span><span style="font-size:10px;color:#94a3b8">Q1: 31 → Q2: 60 → Q3: 74</span></div>
+        <div class="social-metric"><span class="social-metric-name">Reactions</span><span style="font-size:10px;color:#94a3b8">Q1: 653 → Q2: 1,171 → Q3: 2,192</span></div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">▶️ YouTube — COH Main (2025 Annual)</div>
+        <div class="social-metric"><span class="social-metric-name">Total Views</span><span class="social-metric-value">33,500</span></div>
+        <div class="social-metric"><span class="social-metric-name">Hours Watched</span><span class="social-metric-value">10,200</span></div>
+        <div class="social-metric"><span class="social-metric-name">New Subscribers</span><span class="social-metric-value">1,187</span></div>
+        <div class="social-metric" style="margin-top:8px; padding-top:8px; border-top:1px solid #e2e8f0;">
+          <span class="social-metric-name" style="font-style:italic; color:#64748b;">Quarterly trend</span>
+          <span style="font-size:10px;color:#94a3b8">Q1: 7,300 → Q2: 7,900 → Q3: 8,900</span>
+        </div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">🟥 YouTube — Celebrate Recovery (2025)</div>
+        <div class="social-metric"><span class="social-metric-name">Total Views</span><span class="social-metric-value">53,764</span></div>
+        <div class="social-metric"><span class="social-metric-name">New Subscribers</span><span class="social-metric-value">412</span></div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">📷 Instagram — COH Main (2025 Annual)</div>
+        <div class="social-metric"><span class="social-metric-name">Followers</span><span class="social-metric-value">2,650</span></div>
+        <div class="social-metric"><span class="social-metric-name">YoY Follower Growth</span><span class="social-metric-value">+10%</span></div>
+        <div class="social-metric" style="margin-top:8px; padding-top:8px; border-top:1px solid #e2e8f0;">
+          <span class="social-metric-name" style="font-style:italic; color:#64748b;">Q3 snapshot</span>
+        </div>
+        <div class="social-metric"><span class="social-metric-name">Q3 Views</span><span class="social-metric-value">105,855</span></div>
+        <div class="social-metric"><span class="social-metric-name">Q3 Interactions</span><span class="social-metric-value">2,842</span></div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">📱 COH Mobile App (2025)</div>
+        <div class="social-metric"><span class="social-metric-name">New Downloads</span><span class="social-metric-value">419</span></div>
+        <div class="social-metric"><span class="social-metric-name">Church Online Hours</span><span class="social-metric-value">445.3</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════ DATA ═══════════════════════════════════════════
+let ATT_25 = [{"date":"Jan 05","fullDate":"2025-01-05","value":1923},{"date":"Jan 12","fullDate":"2025-01-12","value":2103},{"date":"Jan 19","fullDate":"2025-01-19","value":2015},{"date":"Jan 26","fullDate":"2025-01-26","value":1930},{"date":"Feb 02","fullDate":"2025-02-02","value":1916},{"date":"Feb 09","fullDate":"2025-02-09","value":1888},{"date":"Feb 16","fullDate":"2025-02-16","value":1857},{"date":"Feb 23","fullDate":"2025-02-23","value":1814},{"date":"Mar 02","fullDate":"2025-03-02","value":1943},{"date":"Mar 09","fullDate":"2025-03-09","value":1683},{"date":"Mar 16","fullDate":"2025-03-16","value":1857},{"date":"Mar 23","fullDate":"2025-03-23","value":1858},{"date":"Mar 30","fullDate":"2025-03-30","value":1900},{"date":"Apr 06","fullDate":"2025-04-06","value":1670},{"date":"Apr 13","fullDate":"2025-04-13","value":1892},{"date":"Apr 20","fullDate":"2025-04-20","value":3862},{"date":"Apr 27","fullDate":"2025-04-27","value":1842},{"date":"May 04","fullDate":"2025-05-04","value":1866},{"date":"May 11","fullDate":"2025-05-11","value":2025},{"date":"May 18","fullDate":"2025-05-18","value":1953},{"date":"May 25","fullDate":"2025-05-25","value":1777},{"date":"Jun 01","fullDate":"2025-06-01","value":1727},{"date":"Jun 08","fullDate":"2025-06-08","value":1887},{"date":"Jun 15","fullDate":"2025-06-15","value":1734},{"date":"Jun 22","fullDate":"2025-06-22","value":1408},{"date":"Jun 29","fullDate":"2025-06-29","value":1697},{"date":"Jul 06","fullDate":"2025-07-06","value":1690},{"date":"Jul 13","fullDate":"2025-07-13","value":2136},{"date":"Jul 20","fullDate":"2025-07-20","value":2649},{"date":"Jul 27","fullDate":"2025-07-27","value":1901},{"date":"Aug 03","fullDate":"2025-08-03","value":2073},{"date":"Aug 10","fullDate":"2025-08-10","value":2074},{"date":"Aug 17","fullDate":"2025-08-17","value":2047},{"date":"Aug 24","fullDate":"2025-08-24","value":2136},{"date":"Aug 31","fullDate":"2025-08-31","value":1952},{"date":"Sep 07","fullDate":"2025-09-07","value":2143},{"date":"Sep 14","fullDate":"2025-09-14","value":2178},{"date":"Sep 21","fullDate":"2025-09-21","value":2116},{"date":"Sep 28","fullDate":"2025-09-28","value":2259},{"date":"Oct 05","fullDate":"2025-10-05","value":2149},{"date":"Oct 12","fullDate":"2025-10-12","value":2081},{"date":"Oct 19","fullDate":"2025-10-19","value":2044},{"date":"Oct 26","fullDate":"2025-10-26","value":2224},{"date":"Nov 02","fullDate":"2025-11-02","value":2191},{"date":"Nov 09","fullDate":"2025-11-09","value":2046},{"date":"Nov 16","fullDate":"2025-11-16","value":1965},{"date":"Nov 23","fullDate":"2025-11-23","value":2139},{"date":"Nov 30","fullDate":"2025-11-30","value":1934},{"date":"Dec 07","fullDate":"2025-12-07","value":1982},{"date":"Dec 14","fullDate":"2025-12-14","value":2023},{"date":"Dec 21","fullDate":"2025-12-21","value":1950},{"date":"Dec 28","fullDate":"2025-12-28","value":1597}];
+let ATT_26 = [{"date":"Jan 04","fullDate":"2026-01-04","value":1863},{"date":"Jan 11","fullDate":"2026-01-11","value":1874},{"date":"Jan 18","fullDate":"2026-01-18","value":2152},{"date":"Jan 25","fullDate":"2026-01-25","value":1966},{"date":"Feb 01","fullDate":"2026-02-01","value":1834},{"date":"Feb 08","fullDate":"2026-02-08","value":1464},{"date":"Feb 15","fullDate":"2026-02-15","value":1867},{"date":"Feb 22","fullDate":"2026-02-22","value":1944}];
+let OFF_25 = [{"date":"Jan 05","value":198258},{"date":"Jan 12","value":50870},{"date":"Jan 19","value":70537},{"date":"Jan 26","value":44617},{"date":"Feb 02","value":53068},{"date":"Feb 09","value":50107},{"date":"Feb 16","value":46949},{"date":"Feb 23","value":51673},{"date":"Mar 02","value":61148},{"date":"Mar 09","value":47455},{"date":"Mar 16","value":53290},{"date":"Mar 23","value":50760},{"date":"Mar 30","value":57117},{"date":"Apr 06","value":46698},{"date":"Apr 13","value":56042},{"date":"Apr 20","value":99408},{"date":"Apr 27","value":52560},{"date":"May 04","value":59256},{"date":"May 11","value":62026},{"date":"May 18","value":59285},{"date":"May 25","value":48461},{"date":"Jun 01","value":58263},{"date":"Jun 08","value":59946},{"date":"Jun 15","value":54680},{"date":"Jun 22","value":47793},{"date":"Jun 29","value":55140},{"date":"Jul 06","value":55399},{"date":"Jul 13","value":68753},{"date":"Jul 20","value":75756},{"date":"Jul 27","value":63007},{"date":"Aug 03","value":64697},{"date":"Aug 10","value":69068},{"date":"Aug 17","value":66065},{"date":"Aug 24","value":69601},{"date":"Aug 31","value":60622},{"date":"Sep 07","value":68497},{"date":"Sep 14","value":71014},{"date":"Sep 21","value":63553},{"date":"Sep 28","value":74087},{"date":"Oct 05","value":72543},{"date":"Oct 12","value":61882},{"date":"Oct 19","value":65082},{"date":"Oct 26","value":69742},{"date":"Nov 02","value":76474},{"date":"Nov 09","value":67044},{"date":"Nov 16","value":64302},{"date":"Nov 23","value":77393},{"date":"Nov 30","value":74085},{"date":"Dec 07","value":61218},{"date":"Dec 14","value":75163}];
+let OFF_26 = [{"date":"Jan 04","value":49476},{"date":"Jan 11","value":52773},{"date":"Jan 18","value":58875},{"date":"Jan 25","value":46832},{"date":"Feb 01","value":51694},{"date":"Feb 08","value":56270},{"date":"Feb 15","value":59481},{"date":"Feb 22","value":54778}];
+let LOX_25 = [{"date":"Jan 05","value":1545},{"date":"Jan 12","value":1793},{"date":"Jan 19","value":1723},{"date":"Jan 26","value":1640},{"date":"Feb 02","value":1625},{"date":"Feb 09","value":1578},{"date":"Feb 16","value":1565},{"date":"Feb 23","value":1524},{"date":"Mar 02","value":1629},{"date":"Mar 09","value":1435},{"date":"Mar 16","value":1576},{"date":"Mar 23","value":1538},{"date":"Mar 30","value":1553},{"date":"Apr 06","value":1381},{"date":"Apr 13","value":1553},{"date":"Apr 20","value":3077},{"date":"Apr 27","value":1537},{"date":"May 04","value":1551},{"date":"May 11","value":1641},{"date":"May 18","value":1621},{"date":"May 25","value":1491},{"date":"Jun 01","value":1445},{"date":"Jun 08","value":1590},{"date":"Jun 15","value":1491},{"date":"Jun 22","value":1188},{"date":"Jun 29","value":1413},{"date":"Jul 06","value":1391},{"date":"Jul 13","value":1764},{"date":"Jul 20","value":2308},{"date":"Jul 27","value":1590},{"date":"Aug 03","value":1767},{"date":"Aug 10","value":1759},{"date":"Aug 17","value":1755},{"date":"Aug 24","value":1771},{"date":"Aug 31","value":1583},{"date":"Sep 07","value":1848},{"date":"Sep 14","value":1870},{"date":"Sep 21","value":1812},{"date":"Sep 28","value":1927},{"date":"Oct 05","value":1824},{"date":"Oct 12","value":1706},{"date":"Oct 19","value":1676},{"date":"Oct 26","value":1838},{"date":"Nov 02","value":1809},{"date":"Nov 09","value":1738},{"date":"Nov 16","value":1660},{"date":"Nov 23","value":1829},{"date":"Nov 30","value":1669},{"date":"Dec 07","value":1649},{"date":"Dec 14","value":1764},{"date":"Dec 21","value":1700}];
+let LW_25 = [{"date":"Jan 05","value":378},{"date":"Jan 12","value":310},{"date":"Jan 19","value":292},{"date":"Jan 26","value":290},{"date":"Feb 02","value":291},{"date":"Feb 09","value":310},{"date":"Feb 16","value":292},{"date":"Feb 23","value":290},{"date":"Mar 02","value":314},{"date":"Mar 09","value":248},{"date":"Mar 16","value":281},{"date":"Mar 23","value":320},{"date":"Mar 30","value":347},{"date":"Apr 06","value":289},{"date":"Apr 13","value":339},{"date":"Apr 20","value":785},{"date":"Apr 27","value":305},{"date":"May 04","value":315},{"date":"May 11","value":384},{"date":"May 18","value":332},{"date":"May 25","value":286},{"date":"Jun 01","value":282},{"date":"Jun 08","value":297},{"date":"Jun 15","value":243},{"date":"Jun 22","value":220},{"date":"Jun 29","value":284},{"date":"Jul 06","value":299},{"date":"Jul 13","value":372},{"date":"Jul 20","value":341},{"date":"Jul 27","value":311},{"date":"Aug 03","value":306},{"date":"Aug 10","value":315},{"date":"Aug 17","value":292},{"date":"Aug 24","value":365},{"date":"Aug 31","value":369},{"date":"Sep 07","value":295},{"date":"Sep 14","value":308},{"date":"Sep 21","value":304},{"date":"Sep 28","value":332},{"date":"Oct 05","value":325},{"date":"Oct 12","value":375},{"date":"Oct 19","value":368},{"date":"Oct 26","value":386},{"date":"Nov 02","value":382},{"date":"Nov 09","value":308},{"date":"Nov 16","value":305},{"date":"Nov 23","value":310},{"date":"Nov 30","value":265},{"date":"Dec 07","value":333},{"date":"Dec 14","value":259}];
+let LOX_8 = [{"date":"Jan 05","value":301},{"date":"Jan 12","value":300},{"date":"Jan 19","value":300},{"date":"Jan 26","value":302},{"date":"Feb 02","value":304},{"date":"Feb 09","value":292},{"date":"Feb 16","value":272},{"date":"Feb 23","value":310},{"date":"Mar 02","value":318},{"date":"Mar 09","value":248},{"date":"Mar 16","value":260},{"date":"Mar 23","value":312},{"date":"Mar 30","value":309},{"date":"Apr 06","value":251},{"date":"Apr 13","value":326},{"date":"Apr 20","value":380},{"date":"Apr 27","value":305},{"date":"May 04","value":283},{"date":"May 11","value":326},{"date":"May 18","value":307},{"date":"May 25","value":281},{"date":"Jun 01","value":258},{"date":"Jun 08","value":287},{"date":"Jun 15","value":286},{"date":"Jun 22","value":261},{"date":"Jun 29","value":274},{"date":"Jul 06","value":271},{"date":"Jul 13","value":337},{"date":"Jul 20","value":445},{"date":"Jul 27","value":341},{"date":"Aug 03","value":326},{"date":"Aug 10","value":380},{"date":"Aug 17","value":330},{"date":"Aug 24","value":293},{"date":"Aug 31","value":293},{"date":"Sep 07","value":327},{"date":"Sep 14","value":404},{"date":"Sep 21","value":381},{"date":"Sep 28","value":355},{"date":"Oct 05","value":332},{"date":"Oct 12","value":325},{"date":"Oct 19","value":354},{"date":"Oct 26","value":335},{"date":"Nov 02","value":383},{"date":"Nov 09","value":381},{"date":"Nov 16","value":368},{"date":"Nov 23","value":349},{"date":"Nov 30","value":365},{"date":"Dec 07","value":352},{"date":"Dec 14","value":370},{"date":"Dec 21","value":350}];
+let LOX_10 = [{"date":"Jan 05","value":352},{"date":"Jan 12","value":410},{"date":"Jan 19","value":326},{"date":"Jan 26","value":274},{"date":"Feb 02","value":315},{"date":"Feb 09","value":284},{"date":"Feb 16","value":288},{"date":"Feb 23","value":289},{"date":"Mar 02","value":340},{"date":"Mar 09","value":263},{"date":"Mar 16","value":310},{"date":"Mar 23","value":299},{"date":"Mar 30","value":345},{"date":"Apr 06","value":289},{"date":"Apr 13","value":351},{"date":"Apr 20","value":490},{"date":"Apr 27","value":315},{"date":"May 04","value":316},{"date":"May 11","value":385},{"date":"May 18","value":388},{"date":"May 25","value":325},{"date":"Jun 01","value":271},{"date":"Jun 08","value":326},{"date":"Jun 15","value":298},{"date":"Jun 22","value":191},{"date":"Jun 29","value":321},{"date":"Jul 06","value":330},{"date":"Sep 07","value":501},{"date":"Sep 14","value":391},{"date":"Sep 21","value":395},{"date":"Sep 28","value":384},{"date":"Oct 05","value":350},{"date":"Oct 12","value":335},{"date":"Oct 19","value":361},{"date":"Oct 26","value":418},{"date":"Nov 02","value":365},{"date":"Nov 09","value":347},{"date":"Nov 16","value":311},{"date":"Nov 23","value":394},{"date":"Nov 30","value":345},{"date":"Dec 07","value":340},{"date":"Dec 14","value":392}];
+let LOX_11 = [{"date":"Jan 05","value":232},{"date":"Jan 12","value":254},{"date":"Jan 19","value":246},{"date":"Jan 26","value":219},{"date":"Feb 02","value":202},{"date":"Feb 09","value":218},{"date":"Feb 16","value":186},{"date":"Feb 23","value":159},{"date":"Mar 02","value":179},{"date":"Mar 09","value":202},{"date":"Mar 16","value":280},{"date":"Mar 23","value":217},{"date":"Mar 30","value":190},{"date":"Apr 06","value":175},{"date":"Apr 13","value":193},{"date":"Apr 20","value":392},{"date":"Apr 27","value":201},{"date":"May 04","value":230},{"date":"May 11","value":216},{"date":"May 18","value":215},{"date":"May 25","value":178},{"date":"Jun 01","value":184},{"date":"Jun 08","value":223},{"date":"Jun 15","value":178},{"date":"Jun 22","value":124},{"date":"Jun 29","value":207},{"date":"Aug 03","value":204},{"date":"Aug 10","value":216},{"date":"Aug 17","value":213},{"date":"Aug 24","value":333},{"date":"Aug 31","value":191},{"date":"Sep 07","value":197},{"date":"Sep 14","value":240},{"date":"Sep 21","value":181},{"date":"Sep 28","value":235},{"date":"Oct 05","value":328},{"date":"Oct 12","value":208},{"date":"Oct 19","value":217},{"date":"Oct 26","value":208},{"date":"Nov 02","value":196},{"date":"Nov 09","value":214},{"date":"Nov 16","value":223},{"date":"Nov 23","value":234},{"date":"Nov 30","value":330},{"date":"Dec 07","value":214},{"date":"Dec 14","value":172},{"date":"Dec 21","value":237}];
+let CR_25 = [{"date":"Jan 05","value":93},{"date":"Jan 12","value":79},{"date":"Jan 19","value":84},{"date":"Jan 26","value":93},{"date":"Feb 02","value":78},{"date":"Feb 09","value":80},{"date":"Feb 16","value":63},{"date":"Feb 23","value":92},{"date":"Mar 02","value":92},{"date":"Mar 09","value":52},{"date":"Mar 16","value":74},{"date":"Mar 23","value":66},{"date":"Mar 30","value":82},{"date":"Apr 06","value":68},{"date":"Apr 13","value":77},{"date":"Apr 20","value":212},{"date":"Apr 27","value":81},{"date":"May 04","value":80},{"date":"May 11","value":84},{"date":"May 18","value":60},{"date":"May 25","value":58},{"date":"Jun 01","value":59},{"date":"Jun 08","value":65},{"date":"Jun 15","value":65},{"date":"Jun 22","value":58},{"date":"Jun 29","value":66},{"date":"Jul 06","value":69},{"date":"Jul 13","value":71},{"date":"Aug 03","value":78},{"date":"Aug 10","value":92},{"date":"Aug 17","value":87},{"date":"Aug 24","value":82},{"date":"Aug 31","value":71},{"date":"Sep 07","value":76},{"date":"Sep 14","value":78},{"date":"Sep 21","value":74},{"date":"Sep 28","value":78},{"date":"Oct 05","value":81},{"date":"Oct 12","value":69},{"date":"Oct 19","value":77},{"date":"Oct 26","value":74},{"date":"Nov 02","value":87},{"date":"Nov 09","value":75},{"date":"Nov 16","value":63},{"date":"Nov 23","value":81},{"date":"Nov 30","value":73},{"date":"Dec 07","value":73}];
+let YTH_25 = [{"date":"Jan 12","value":143},{"date":"Jan 19","value":143},{"date":"Jan 26","value":148},{"date":"Feb 02","value":156},{"date":"Feb 09","value":166},{"date":"Feb 16","value":167},{"date":"Feb 23","value":152},{"date":"Mar 02","value":149},{"date":"Mar 09","value":157},{"date":"Mar 16","value":134},{"date":"Mar 23","value":143},{"date":"Mar 30","value":134},{"date":"Apr 06","value":151},{"date":"Apr 13","value":150},{"date":"Apr 27","value":150},{"date":"May 04","value":153},{"date":"May 11","value":163},{"date":"May 18","value":157},{"date":"May 25","value":136},{"date":"Jun 01","value":143},{"date":"Jun 08","value":129},{"date":"Jun 15","value":130},{"date":"Jun 22","value":130},{"date":"Jun 29","value":156},{"date":"Jul 13","value":220},{"date":"Jul 20","value":220},{"date":"Sep 07","value":198},{"date":"Sep 14","value":155},{"date":"Sep 21","value":167},{"date":"Sep 28","value":174},{"date":"Oct 05","value":149},{"date":"Oct 12","value":157},{"date":"Oct 19","value":149},{"date":"Oct 26","value":169},{"date":"Nov 02","value":173},{"date":"Nov 09","value":149},{"date":"Nov 16","value":152},{"date":"Nov 23","value":165},{"date":"Nov 30","value":141},{"date":"Dec 07","value":156}];
+const KIDS_25 = [{"date":"Jan 05","value":81},{"date":"Jan 12","value":90},{"date":"Jan 19","value":90},{"date":"Jan 26","value":92},{"date":"Feb 02","value":101},{"date":"Feb 09","value":93},{"date":"Feb 16","value":100},{"date":"Feb 23","value":86},{"date":"Mar 02","value":92},{"date":"Mar 09","value":77},{"date":"Mar 16","value":101},{"date":"Mar 23","value":90},{"date":"Mar 30","value":95},{"date":"Apr 06","value":86},{"date":"Apr 13","value":102},{"date":"Apr 20","value":190},{"date":"Apr 27","value":97},{"date":"May 04","value":89},{"date":"May 11","value":108},{"date":"May 18","value":94},{"date":"May 25","value":76},{"date":"Jun 01","value":74},{"date":"Jun 08","value":87},{"date":"Jun 15","value":73},{"date":"Jun 22","value":44},{"date":"Jun 29","value":63},{"date":"Jul 06","value":56},{"date":"Jul 13","value":90},{"date":"Aug 03","value":83},{"date":"Aug 10","value":82},{"date":"Aug 17","value":80},{"date":"Aug 24","value":86},{"date":"Aug 31","value":68},{"date":"Sep 07","value":72},{"date":"Sep 14","value":80},{"date":"Sep 21","value":65},{"date":"Sep 28","value":72},{"date":"Oct 05","value":77},{"date":"Oct 12","value":66},{"date":"Oct 19","value":68},{"date":"Oct 26","value":67},{"date":"Nov 02","value":71},{"date":"Nov 09","value":75},{"date":"Nov 16","value":65},{"date":"Nov 23","value":80},{"date":"Nov 30","value":60},{"date":"Dec 07","value":68},{"date":"Dec 14","value":77}];
+
+// ─── 2026 CAMPUS DATA ─────────────────────────────────────────────────────
+let LOX_26 = [{"date":"Jan 04","value":1508},{"date":"Jan 11","value":1556},{"date":"Jan 18","value":1826},{"date":"Jan 25","value":1654},{"date":"Feb 01","value":1590},{"date":"Feb 08","value":1166},{"date":"Feb 15","value":1543},{"date":"Feb 22","value":1492}];
+let LW_26 = [{"date":"Jan 04","value":355},{"date":"Jan 11","value":318},{"date":"Jan 18","value":326},{"date":"Jan 25","value":312},{"date":"Feb 01","value":244},{"date":"Feb 08","value":298},{"date":"Feb 15","value":324},{"date":"Feb 22","value":354}];
+let ESP_26 = [{"date":"Jan 04","value":67},{"date":"Jan 11","value":76},{"date":"Jan 18","value":74},{"date":"Jan 25","value":96},{"date":"Feb 01","value":83},{"date":"Feb 08","value":96},{"date":"Feb 15","value":84},{"date":"Feb 22","value":95}];
+let CR_26 = [{"date":"Jan 18","value":87},{"date":"Jan 25","value":78},{"date":"Feb 01","value":85},{"date":"Feb 08","value":88},{"date":"Feb 22","value":79}];
+let YTH_26 = [{"date":"Jan 18","value":181},{"date":"Jan 25","value":145},{"date":"Feb 01","value":178},{"date":"Feb 22","value":125}];
+
+// ─── 2025 ESPAÑOL DATA ────────────────────────────────────────────────────
+let ESP_25 = [{"date":"Jan 5","fullDate":"2025-01-05","value":88},{"date":"Jan 12","fullDate":"2025-01-12","value":86},{"date":"Jan 19","fullDate":"2025-01-19","value":114},{"date":"Jan 26","fullDate":"2025-01-26","value":82},{"date":"Feb 2","fullDate":"2025-02-02","value":81},{"date":"Feb 9","fullDate":"2025-02-09","value":78},{"date":"Feb 16","fullDate":"2025-02-16","value":72},{"date":"Feb 23","fullDate":"2025-02-23","value":67},{"date":"Mar 2","fullDate":"2025-03-02","value":81},{"date":"Mar 9","fullDate":"2025-03-09","value":72},{"date":"Mar 16","fullDate":"2025-03-16","value":86},{"date":"Mar 23","fullDate":"2025-03-23","value":77},{"date":"Mar 30","fullDate":"2025-03-30","value":76},{"date":"Apr 6","fullDate":"2025-04-06","value":79},{"date":"Apr 13","fullDate":"2025-04-13","value":86},{"date":"Apr 20","fullDate":"2025-04-20","value":149},{"date":"Apr 27","fullDate":"2025-04-27","value":74},{"date":"May 4","fullDate":"2025-05-04","value":85},{"date":"May 11","fullDate":"2025-05-11","value":67},{"date":"May 18","fullDate":"2025-05-18","value":68},{"date":"Jun 1","fullDate":"2025-06-01","value":99},{"date":"Jun 8","fullDate":"2025-06-08","value":94},{"date":"Jun 15","fullDate":"2025-06-15","value":74},{"date":"Jun 22","fullDate":"2025-06-22","value":82},{"date":"Jun 29","fullDate":"2025-06-29","value":81},{"date":"Jul 6","fullDate":"2025-07-06","value":78},{"date":"Jul 13","fullDate":"2025-07-13","value":68},{"date":"Jul 20","fullDate":"2025-07-20","value":68},{"date":"Jul 27","fullDate":"2025-07-27","value":72},{"date":"Aug 3","fullDate":"2025-08-03","value":79},{"date":"Aug 10","fullDate":"2025-08-10","value":97},{"date":"Aug 17","fullDate":"2025-08-17","value":75},{"date":"Aug 24","fullDate":"2025-08-24","value":106},{"date":"Aug 31","fullDate":"2025-08-31","value":73},{"date":"Sep 7","fullDate":"2025-09-07","value":80},{"date":"Sep 14","fullDate":"2025-09-14","value":91},{"date":"Sep 21","fullDate":"2025-09-21","value":103},{"date":"Sep 28","fullDate":"2025-09-28","value":108},{"date":"Oct 5","fullDate":"2025-10-05","value":94},{"date":"Oct 12","fullDate":"2025-10-12","value":81},{"date":"Oct 19","fullDate":"2025-10-19","value":88},{"date":"Oct 26","fullDate":"2025-10-26","value":64},{"date":"Nov 2","fullDate":"2025-11-02","value":93},{"date":"Nov 9","fullDate":"2025-11-09","value":84},{"date":"Nov 16","fullDate":"2025-11-16","value":68},{"date":"Nov 23","fullDate":"2025-11-23","value":76},{"date":"Nov 30","fullDate":"2025-11-30","value":99},{"date":"Dec 7","fullDate":"2025-12-07","value":93},{"date":"Dec 14","fullDate":"2025-12-14","value":124},{"date":"Dec 21","fullDate":"2025-12-21","value":110}];
+
+const OFF_BREAKDOWN = {"General / Flourish":2869508,"Español":158559,"Love the 561":100864,"Missions":36866,"Celebrate Recovery":34810,"YTH Camp":16414,"COH Kids":1426};
+
+const MAPS_TABLE = [
+  // ── DISINTERESTED ─────────────────────────────────────────────────────────
+  {stage:"Disinterested",cat:"dis",metric:"Support Groups (participants)",Q1:44,Q2:43,Q3:24,Q4:127,annual:96,owner:"Jeff"},
+  {stage:"Disinterested",cat:"dis",metric:"Social Media Engagement",Q1:null,Q2:null,Q3:null,Q4:null,annual:null,owner:"Maddie"},
+  {stage:"Disinterested",cat:"dis",metric:"Community-Wide Events & Gatherings",Q1:null,Q2:null,Q3:null,Q4:null,annual:null,owner:"Fam Min"},
+  {stage:"Disinterested",cat:"dis",metric:"Servant Evangelism",Q1:null,Q2:null,Q3:null,Q4:null,annual:null,owner:"Stacey"},
+  {stage:"Disinterested",cat:"dis",metric:"Food Distributions (individuals)",Q1:4258,Q2:3765,Q3:3590,Q4:3208,annual:14821,owner:"Stacey"},
+  // ── INTERESTED ────────────────────────────────────────────────────────────
+  {stage:"Interested",cat:"int",metric:"Avg Weekly Attendance (all campuses)",Q1:null,Q2:null,Q3:null,Q4:null,annual:2262,owner:"Trevor"},
+  {stage:"Interested",cat:"int",metric:"Open House Attendance",Q1:null,Q2:null,Q3:17,Q4:12,annual:29,owner:"Beth"},
+  {stage:"Interested",cat:"int",metric:"Next Steps Forms",Q1:2,Q2:3,Q3:2,Q4:4,annual:11,owner:"Beth"},
+  {stage:"Interested",cat:"int",metric:"Digital Connect Cards",Q1:18,Q2:40,Q3:70,Q4:82,annual:210,owner:"Beth"},
+  {stage:"Interested",cat:"int",metric:"Welcome Bags",Q1:null,Q2:null,Q3:null,Q4:null,annual:null,owner:"Beth"},
+  {stage:"Interested",cat:"int",metric:"Alpha Attendance",Q1:null,Q2:null,Q3:70,Q4:null,annual:69,owner:"Jessica"},
+  {stage:"Interested",cat:"int",metric:"Monday Connect Sign-ups",Q1:232,Q2:463,Q3:152,Q4:null,annual:847,owner:"Maddie"},
+  {stage:"Interested",cat:"int",metric:"New Follows on Social",Q1:31,Q2:60,Q3:74,Q4:null,annual:165,owner:"Maddie"},
+  {stage:"Interested",cat:"int",metric:"App Downloads (New COH App)",Q1:null,Q2:null,Q3:null,Q4:null,annual:419,owner:"Maddie"},
+  // ── GROWING TOGETHER ──────────────────────────────────────────────────────
+  {stage:"Growing Together",cat:"grow",metric:"New Partners",Q1:null,Q2:null,Q3:null,Q4:null,annual:86,owner:"Cindy/Susan/Carmen"},
+  {stage:"Growing Together",cat:"grow",metric:"Baptisms",Q1:null,Q2:null,Q3:91,Q4:34,annual:125,owner:"Cindy/Susan/Carmen"},
+  {stage:"Growing Together",cat:"grow",metric:"New Giving Units",Q1:null,Q2:null,Q3:null,Q4:null,annual:null,owner:"Craig"},
+  {stage:"Growing Together",cat:"grow",metric:"New Volunteers",Q1:null,Q2:null,Q3:null,Q4:null,annual:null,owner:"TBD"},
+  {stage:"Growing Together",cat:"grow",metric:"Groups & Course Attendance",Q1:null,Q2:null,Q3:null,Q4:null,annual:710,owner:"Cindy/Susan/Carmen"},
+  {stage:"Growing Together",cat:"grow",metric:"Active Small Groups",Q1:null,Q2:null,Q3:null,Q4:null,annual:77,owner:"Jessica"},
+  {stage:"Growing Together",cat:"grow",metric:"Freedom Course",Q1:null,Q2:null,Q3:null,Q4:null,annual:133,owner:"Trevor"},
+  // ── FULLY DEVOTED ─────────────────────────────────────────────────────────
+  {stage:"Fully Devoted",cat:"dev",metric:"Discipleship Bands",Q1:20,Q2:47,Q3:53,Q4:null,annual:53,owner:"Jessica"},
+  {stage:"Fully Devoted",cat:"dev",metric:"COH YTH Leadership",Q1:null,Q2:39,Q3:34,Q4:null,annual:34,owner:"TJ"},
+  {stage:"Fully Devoted",cat:"dev",metric:"CR Sponsor Relationships",Q1:null,Q2:null,Q3:21,Q4:null,annual:21,owner:"Trevor"},
+  {stage:"Fully Devoted",cat:"dev",metric:"CR Step Studies",Q1:null,Q2:null,Q3:42,Q4:null,annual:42,owner:"Trevor"},
+];
+
+// ═══════════════════════════ STATE ══════════════════════════════════════════
+let currentYear = 2025;
+let charts = {};
+
+// ═══════════════════════════ UTILS ══════════════════════════════════════════
+const fmt = (n) => n == null ? '—' : n.toLocaleString();
+const fmtCur = (n) => '$' + Math.round(n).toLocaleString();
+const avg = (arr) => arr.length ? Math.round(arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
+const sum = (arr) => arr.reduce((a,b)=>a+b,0);
+const vals = (arr) => arr.map(r=>r.value);
+const lbls = (arr) => arr.map(r=>r.date);
+const COLORS = ['#2563eb','#10b981','#f59e0b','#8b5cf6','#e11d48','#0d9488','#ea580c'];
+function mkChart(id, type, labels, datasets, opts={}) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, {
+    type, data: {labels, datasets},
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {display: opts.legend !== false, labels: {boxWidth:12, font:{size:11}}},
+        tooltip: {callbacks: {label: (c) => {
+          const v = c.raw;
+          if (opts.currency) return ' ' + fmtCur(v);
+          return ' ' + fmt(v);
+        }}}
+      },
+      scales: type === 'doughnut' || type === 'pie' ? {} : {
+        x: {grid:{display:false}, ticks:{font:{size:10}, maxRotation:45, maxTicksLimit: opts.maxTicks||20}},
+        y: {grid:{color:'#f1f5f9'}, ticks:{font:{size:11}, callback: opts.currency ? (v)=>'$'+v.toLocaleString() : (v)=>v.toLocaleString()}}
+      },
+      ...opts.extra
+    }
+  });
+}
+
+// ═══════════════════════════ KPI CARDS ══════════════════════════════════════
+// Additional 2025 giving not captured in weekly data (updated as available)
+const GIVING_ADJ_25 = 959013.07;
+
+// ─── LIVE DATA CONFIG ────────────────────────────────────────────────────────
+const SHEET_ID    = '1m6pdQuS3EXF6alnooLOovzXZG5Nfea-bCtiOWkSNT7Y';
+let   CC_26_YTD   = 52;   // Connect Cards 2026 YTD — overwritten on live load
+let   DATA_LIVE   = false; // true once sheet fetch succeeds
+const MONTHS_3    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── CSV fetch helpers ────────────────────────────────────────────────────────
+async function fetchSheetCSV(sheetName) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching "${sheetName}"`);
+  return resp.text();
+}
+
+function parseCSV(text) {
+  // Split on real newlines first, then parse each line for quoted fields
+  const lines = text.split(/\r?\n/);
+  const rows = [];
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const cells = [];
+    let field = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; continue; }
+      if (!inQ && ch === ',') { cells.push(field.trim()); field = ''; continue; }
+      field += ch;
+    }
+    cells.push(field.trim());
+    rows.push(cells);
+  }
+  return rows.filter(r => r.some(c => c));
+}
+
+function parseDateLabel(str) {
+  // Handles M/D/YYYY and M/D/YY (US locale Google Sheets CSV)
+  const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (!m) return null;
+  let [, mo, dy, yr] = m.map(Number);
+  if (yr < 100) yr += 2000;
+  return {
+    label:    `${MONTHS_3[mo-1]} ${String(dy).padStart(2,'0')}`,
+    fullDate: `${yr}-${String(mo).padStart(2,'0')}-${String(dy).padStart(2,'0')}`
+  };
+}
+
+function sheetExtract(rows, campus, category, fallback) {
+  const header = rows[0];
+  let dataRow = rows.find(r => r[0] === campus && r[1] === category);
+  if (!dataRow && fallback) dataRow = rows.find(r => r[0] === campus && r[1] === fallback);
+  if (!dataRow) { console.warn(`Sheet row not found: ${campus} / ${category}`); return null; }
+  const out = [];
+  for (let i = 2; i < header.length; i++) {
+    const d = parseDateLabel(header[i]);
+    if (!d) continue;
+    const v = parseFloat(dataRow[i]);
+    if (!isNaN(v) && v > 0) out.push({ date: d.label, fullDate: d.fullDate, value: Math.round(v) });
+  }
+  return out.length ? out : null; // return null if empty (keep default)
+}
+
+// ── Main live-data loader ────────────────────────────────────────────────────
+async function loadLiveData() {
+  const badge = document.getElementById('data-badge');
+  if (badge) { badge.textContent = '⏳ Syncing…'; badge.style.color = '#94a3b8'; }
+
+  try {
+    const [csv25, csv26] = await Promise.all([
+      fetchSheetCSV('2025 All Campuses Combined'),
+      fetchSheetCSV('2026 All Campuses Combined')
+    ]);
+    const rows25 = parseCSV(csv25);
+    const rows26 = parseCSV(csv26);
+
+    // Helper: only overwrite if we got real data back
+    const update = (target, val) => { if (val && val.length) eval(`${target} = val`); };
+
+    // 2025 attendance
+    const a25  = sheetExtract(rows25, 'All',         'TOTAL Attendance');          if (a25)  ATT_25  = a25;
+    const lx25 = sheetExtract(rows25, 'Loxahatchee', 'TOTAL ATTENDANCE');          if (lx25) LOX_25  = lx25;
+    const lw25 = sheetExtract(rows25, 'Lake Worth',  'TOTAL ATTENDANCE');          if (lw25) LW_25   = lw25;
+    const e25  = sheetExtract(rows25, 'Loxahatchee', 'Service Attendance - COH Espanol');   if (e25)  ESP_25  = e25;
+    const cr25 = sheetExtract(rows25, 'Loxahatchee', 'Service Attendance - CR Attendance'); if (cr25) CR_25   = cr25;
+    const y25  = sheetExtract(rows25, 'Loxahatchee', 'Service Attendance - COH YTH');       if (y25)  YTH_25  = y25;
+    const l8   = sheetExtract(rows25, 'Loxahatchee', 'Service Attendance - Sunday 8:30');   if (l8)   LOX_8   = l8;
+    const l10  = sheetExtract(rows25, 'Loxahatchee', 'Service Attendance - Sunday 10:00');  if (l10)  LOX_10  = l10;
+    const l11  = sheetExtract(rows25, 'Loxahatchee', 'Service Attendance - Sunday 11:30');  if (l11)  LOX_11  = l11;
+    const off25= sheetExtract(rows25, 'All',         'TOTAL Offering', 'TOTAL OFFERING');   if (off25) OFF_25 = off25;
+
+    // 2026 attendance
+    const a26  = sheetExtract(rows26, 'All',         'TOTAL Attendance');          if (a26)  ATT_26  = a26;
+    const lx26 = sheetExtract(rows26, 'Loxahatchee', 'TOTAL ATTENDANCE');          if (lx26) LOX_26  = lx26;
+    const lw26 = sheetExtract(rows26, 'Lake Worth',  'TOTAL ATTENDANCE');          if (lw26) LW_26   = lw26;
+    const e26  = sheetExtract(rows26, 'Loxahatchee', 'Service Attendance - COH Espanol');   if (e26)  ESP_26  = e26;
+    const cr26 = sheetExtract(rows26, 'Loxahatchee', 'Service Attendance - CR Attendance'); if (cr26) CR_26   = cr26;
+    const y26  = sheetExtract(rows26, 'Loxahatchee', 'Service Attendance - COH YTH');       if (y26)  YTH_26  = y26;
+    const off26= sheetExtract(rows26, 'All',         'TOTAL Offering', 'TOTAL OFFERING');   if (off26) OFF_26 = off26;
+
+    // 2026 Connect Cards YTD (sum all weekly values)
+    const ccRow = rows26.find(r => r[0] === 'All' && r[1] === 'Total Connect Cards filled out');
+    if (ccRow) CC_26_YTD = Math.round(ccRow.slice(2).reduce((s, v) => s + (parseFloat(v) || 0), 0));
+
+    DATA_LIVE = true;
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (badge) { badge.textContent = `🟢 Live · ${now}`; badge.style.color = '#10b981'; }
+
+    // Refresh the visible charts with live numbers
+    renderKPIs();
+    renderOverviewCharts();
+    if (document.getElementById('page-attendance')?.classList.contains('active')) renderAttendanceCharts();
+    if (document.getElementById('page-giving')?.classList.contains('active'))     renderGivingCharts();
+
+  } catch (err) {
+    console.error('Live data fetch failed:', err);
+    if (badge) { badge.textContent = '🟡 Cached data'; badge.style.color = '#d97706'; }
+  }
+}
+
+function renderKPIs() {
+  const att = currentYear === 2025 ? ATT_25 : ATT_26;
+  const off = currentYear === 2025 ? OFF_25 : OFF_26;
+  const avgAtt = avg(vals(att));
+  const totalOff = sum(vals(off)) + (currentYear === 2025 ? GIVING_ADJ_25 : 0);
+  const latestAtt = att[att.length-1]?.value || 0;
+  const weeks = att.length;
+  const yrLabel = currentYear === 2026 ? `YTD (${weeks} wks)` : 'Full Year';
+
+  const kpiRow = document.getElementById('kpi-row');
+  kpiRow.innerHTML = `
+    <div class="kpi-card blue"><div class="kpi-icon">👥</div>
+      <div class="kpi-label">Avg Weekly Attendance</div>
+      <div class="kpi-value">${fmt(avgAtt)}</div>
+      <div class="kpi-sub">${yrLabel} — All campuses</div>
+    </div>
+    <div class="kpi-card teal"><div class="kpi-icon">🏛️</div>
+      <div class="kpi-label">Latest Week</div>
+      <div class="kpi-value">${fmt(latestAtt)}</div>
+      <div class="kpi-sub">${att[att.length-1]?.date || ''}</div>
+    </div>
+    <div class="kpi-card amber"><div class="kpi-icon">💰</div>
+      <div class="kpi-label">Total Giving ${yrLabel}</div>
+      <div class="kpi-value">${fmtCur(totalOff)}</div>
+      <div class="kpi-sub">${fmtCur(Math.round(totalOff/weeks))}/week avg</div>
+    </div>
+    <div class="kpi-card purple"><div class="kpi-icon">📋</div>
+      <div class="kpi-label">Connect Cards (${currentYear} YTD)</div>
+      <div class="kpi-value">${currentYear === 2025 ? '210' : Math.round(CC_26_YTD)}</div>
+      <div class="kpi-sub">${currentYear === 2025 ? 'Digital cards Q1–Q4' : 'Digital cards YTD (8 wks)'}</div>
+    </div>
+    <div class="kpi-card rose"><div class="kpi-icon">🍎</div>
+      <div class="kpi-label">Food Distributions (${currentYear === 2025 ? '2025 Annual' : '2026 YTD'})</div>
+      <div class="kpi-value">${currentYear === 2025 ? '14,821' : '—'}</div>
+      <div class="kpi-sub">${currentYear === 2025 ? 'Individuals served (annual)' : 'Data in progress'}</div>
+    </div>`;
+
+  // Attendance page KPIs — using 2025 Annual Report official averages
+  const kpiAtt = document.getElementById('kpi-att');
+  if (kpiAtt) {
+    kpiAtt.innerHTML = `
+      <div class="kpi-card blue"><div class="kpi-icon">🏛️</div>
+        <div class="kpi-label">Loxahatchee Avg Weekly</div>
+        <div class="kpi-value">1,624</div>
+        <div class="kpi-sub">2025 Annual Report</div>
+      </div>
+      <div class="kpi-card teal"><div class="kpi-icon">🏢</div>
+        <div class="kpi-label">Lake Worth Avg Weekly</div>
+        <div class="kpi-value">305</div>
+        <div class="kpi-sub">2025 Annual Report</div>
+      </div>
+      <div class="kpi-card amber"><div class="kpi-icon">🌐</div>
+        <div class="kpi-label">COH Español Avg Weekly</div>
+        <div class="kpi-value">83</div>
+        <div class="kpi-sub">2025 Annual Report</div>
+      </div>
+      <div class="kpi-card purple"><div class="kpi-icon">💻</div>
+        <div class="kpi-label">Online Avg Weekly</div>
+        <div class="kpi-value">260</div>
+        <div class="kpi-sub">2025 Annual Report</div>
+      </div>
+      <div class="kpi-card green"><div class="kpi-icon">✝️</div>
+        <div class="kpi-label">All Campuses Combined</div>
+        <div class="kpi-value">2,262</div>
+        <div class="kpi-sub">2025 Annual Report</div>
+      </div>`;
+  }
+
+  // Giving page KPIs
+  const kpiGiving = document.getElementById('kpi-giving');
+  if (kpiGiving) {
+    const totalGiving25 = sum(vals(OFF_25)) + GIVING_ADJ_25;
+    const avgWeeklyGiving25 = avg(vals(OFF_25));
+    const totalGiving26 = sum(vals(OFF_26));
+    kpiGiving.innerHTML = `
+      <div class="kpi-card blue"><div class="kpi-icon">💰</div>
+        <div class="kpi-label">Total Giving 2025</div>
+        <div class="kpi-value">${fmtCur(totalGiving25)}</div>
+        <div class="kpi-sub">Full year all campuses</div>
+      </div>
+      <div class="kpi-card teal"><div class="kpi-icon">📅</div>
+        <div class="kpi-label">Avg Weekly Giving 2025</div>
+        <div class="kpi-value">${fmtCur(avgWeeklyGiving25)}</div>
+        <div class="kpi-sub">Over 50 recorded weeks</div>
+      </div>
+      <div class="kpi-card amber"><div class="kpi-icon">📈</div>
+        <div class="kpi-label">2026 T1 Giving (YTD)</div>
+        <div class="kpi-value">${fmtCur(totalGiving26)}</div>
+        <div class="kpi-sub">Trimester 1 (Jan–May)</div>
+      </div>
+      <div class="kpi-card purple"><div class="kpi-icon">✝️</div>
+        <div class="kpi-label">Missions Giving 2025</div>
+        <div class="kpi-value">$36,866</div>
+        <div class="kpi-sub">Full year total</div>
+      </div>
+      <div class="kpi-card green"><div class="kpi-icon">❤️</div>
+        <div class="kpi-label">Love the 561 (2025)</div>
+        <div class="kpi-value">$100,864</div>
+        <div class="kpi-sub">Community benevolence fund</div>
+      </div>`;
+  }
+}
+
+// ═══════════════════════════ CHARTS ══════════════════════════════════════════
+function renderOverviewCharts() {
+  const att = currentYear === 2025 ? ATT_25 : ATT_26;
+  const off = currentYear === 2025 ? OFF_25 : OFF_26;
+
+  // Attendance trend (2025 + 2026 on same axis)
+  const allDates = [...new Set([...ATT_25.map(r=>r.date), ...ATT_26.map(r=>r.date)])];
+  const labelsAll = ATT_25.map(r=>r.date); // use 2025 as X axis
+  mkChart('chartAttTrend','line', labelsAll, [
+    {label:'2025 Attendance', data: ATT_25.map(r=>r.value), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.08)', tension:0.35, pointRadius:2, fill:true},
+    {label:'2026 Attendance (same X axis position)', data: [...ATT_26.map(r=>r.value), ...Array(labelsAll.length - ATT_26.length).fill(null)], borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.08)', tension:0.35, pointRadius:3, fill:false, borderDash:[6,3]},
+  ], {legend:true, maxTicks:26});
+
+  // Offering trend
+  mkChart('chartOffTrend','line', off.map(r=>r.date), [
+    {label:'Weekly Giving', data:vals(off), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.08)', tension:0.35, pointRadius:2, fill:true}
+  ], {currency:true, legend:false, maxTicks:18});
+
+  // Offering doughnut
+  const offLabels = Object.keys(OFF_BREAKDOWN);
+  const offVals   = Object.values(OFF_BREAKDOWN);
+  mkChart('chartOffDoughnut','doughnut', offLabels, [{
+    data: offVals, backgroundColor: COLORS, borderWidth:2, borderColor:'#fff'
+  }], {currency:true, extra:{plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:11}}}}}});
+}
+
+function renderAttendanceCharts() {
+  const is26 = currentYear === 2026;
+
+  // ── Campus weekly line chart (year-aware + ministry lines) ──────────────
+  const loxData  = is26 ? LOX_26  : LOX_25;
+  const lwData   = is26 ? LW_26   : LW_25;
+  const espData  = is26 ? ESP_26  : ESP_25;
+  const crData   = is26 ? CR_26   : CR_25;
+  const ythData  = is26 ? YTH_26  : YTH_25;
+
+  const allLbls = loxData.map(r=>r.date);
+  const lwMap   = Object.fromEntries(lwData.map(r=>[r.date, r.value]));
+  const espMap  = Object.fromEntries(espData.map(r=>[r.date, r.value]));
+  const crMap   = Object.fromEntries(crData.map(r=>[r.date, r.value]));
+  const ythMap  = Object.fromEntries(ythData.map(r=>[r.date, r.value]));
+
+  mkChart('chartCampusWeekly','line', allLbls, [
+    {label:'Loxahatchee',   data:vals(loxData), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.05)', tension:0.35, pointRadius:2, fill:true},
+    {label:'Lake Worth',    data:allLbls.map(d=>lwMap[d]||null),  borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.05)', tension:0.35, pointRadius:2, fill:false, spanGaps:true},
+    {label:'COH Español',   data:allLbls.map(d=>espMap[d]||null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.05)', tension:0.35, pointRadius:3, fill:false, spanGaps:true, borderDash:[]},
+    {label:'COH Youth',     data:allLbls.map(d=>ythMap[d]||null), borderColor:'#7c3aed', backgroundColor:'rgba(124,58,237,0.05)', tension:0.35, pointRadius:3, fill:false, spanGaps:true, borderDash:[4,4]},
+    {label:'Celebrate Recovery', data:allLbls.map(d=>crMap[d]||null), borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,0.05)', tension:0.35, pointRadius:3, fill:false, spanGaps:true, borderDash:[6,3]},
+  ], {maxTicks:26, extra:{plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});
+
+  // ── Service time avg bars (2025 only) ──────────────────────────────────
+  if (!is26) {
+    mkChart('chartServiceTimes','bar',['8:30 AM','10:00 AM','11:30 AM'],[{
+      label:'Avg Attendance',
+      data:[avg(vals(LOX_8)), avg(vals(LOX_10)), avg(vals(LOX_11))],
+      backgroundColor:['#2563eb','#10b981','#f59e0b'], borderRadius:8, barThickness:48
+    }],{legend:false});
+  } else {
+    mkChart('chartServiceTimes','bar',['8:30 AM','10:00 AM','11:30 AM'],[{
+      label:'Avg Attendance (2026 YTD)',
+      data:[null, null, null],
+      backgroundColor:['#2563eb','#10b981','#f59e0b'], borderRadius:8, barThickness:48
+    }],{legend:false});
+  }
+
+  // ── Ministry avg bars ──────────────────────────────────────────────────
+  const minLabels = ['Celebrate Recovery','COH Youth','COH Kids','Español','Online'];
+  const minData26 = [
+    Math.round(avg(vals(CR_26))),
+    Math.round(avg(vals(YTH_26))),
+    null,
+    Math.round(avg(vals(ESP_26))),
+    null
+  ];
+  const minData25 = [90, 142, 179, 83, 260];
+  mkChart('chartMinistry','bar', minLabels,[{
+    label:'Avg Weekly Attendance',
+    data: is26 ? minData26 : minData25,
+    backgroundColor:COLORS, borderRadius:6
+  }],{legend:false});
+
+  // ── Service time lines (2025 only) ─────────────────────────────────────
+  if (!is26) {
+    const lineLabels = LOX_8.map(r=>r.date);
+    const l10Map = Object.fromEntries(LOX_10.map(r=>[r.date,r.value]));
+    const l11Map = Object.fromEntries(LOX_11.map(r=>[r.date,r.value]));
+    mkChart('chartServiceLine','line', lineLabels, [
+      {label:'8:30 AM',  data:vals(LOX_8), borderColor:'#2563eb', tension:0.35, pointRadius:1, fill:false},
+      {label:'10:00 AM', data:lineLabels.map(d=>l10Map[d]||null), borderColor:'#10b981', tension:0.35, pointRadius:1, fill:false, spanGaps:true},
+      {label:'11:30 AM', data:lineLabels.map(d=>l11Map[d]||null), borderColor:'#f59e0b', tension:0.35, pointRadius:1, fill:false, spanGaps:true},
+    ], {maxTicks:20});
+  }
+}
+
+function renderGivingCharts() {
+  mkChart('chartGiving25','line', OFF_25.map(r=>r.date), [
+    {label:'Weekly Giving', data:vals(OFF_25), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.07)', tension:0.35, pointRadius:2, fill:true}
+  ], {currency:true, legend:false, maxTicks:18});
+
+  mkChart('chartGiving26','line', OFF_26.map(r=>r.date), [
+    {label:'Weekly Giving', data:vals(OFF_26), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.07)', tension:0.35, pointRadius:4, fill:true}
+  ], {currency:true, legend:false});
+
+  const offLabels = Object.keys(OFF_BREAKDOWN);
+  const offVals   = Object.values(OFF_BREAKDOWN);
+  mkChart('chartGivingFunds','doughnut', offLabels, [{
+    data:offVals, backgroundColor:COLORS, borderWidth:2, borderColor:'#fff'
+  }], {currency:true, extra:{plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:11}}}}}});
+
+  mkChart('chartGivingBar','bar', offLabels, [{
+    label:'Total Giving', data:offVals, backgroundColor:COLORS, borderRadius:6
+  }], {currency:true, legend:false});
+}
+
+function renderMAPSCharts() {
+  // Disinterested — support groups quarterly + food distributions annual
+  mkChart('chartMapsD','bar',['Q1','Q2','Q3','Q4'],[
+    {label:'Support Groups (participants)', data:[44,43,24,127], backgroundColor:'rgba(37,99,235,0.75)', borderRadius:6},
+    {label:'Food Distributions ÷100 (individuals)', data:[43,38,36,32], backgroundColor:'rgba(37,99,235,0.25)', borderRadius:6},
+  ],{extra:{plugins:{legend:{display:true},tooltip:{callbacks:{label:(c)=>{
+    if(c.datasetIndex===1) return ` Food Dist: ${(c.raw*100).toLocaleString()}`;
+    return ` ${c.dataset.label}: ${fmt(c.raw)}`;
+  }}}}}});
+
+  // Interested — connect cards growth story
+  mkChart('chartMapsI','bar',['Q1','Q2','Q3','Q4'],[
+    {label:'Digital Connect Cards', data:[18,40,70,82], backgroundColor:'rgba(16,185,129,0.8)', borderRadius:4},
+    {label:'Monday Connect Sign-ups', data:[232,463,152,null], backgroundColor:'rgba(5,150,105,0.4)', borderRadius:4},
+  ],{extra:{plugins:{legend:{display:true}}}});
+
+  // Growing Together — new partners, baptisms
+  mkChart('chartMapsG','bar',['New Partners','Baptisms','Groups & Courses','Freedom Course'],[
+    {label:'2025 Annual', data:[86,125,710,133], backgroundColor:['rgba(245,158,11,0.8)','rgba(245,158,11,0.6)','rgba(245,158,11,0.4)','rgba(245,158,11,0.25)'], borderRadius:6}
+  ],{legend:false});
+
+  // Fully Devoted — with Discipleship Bands added
+  mkChart('chartMapsF','bar',['Discipleship Bands','YTH Leadership','CR Step Studies','CR Sponsor Rel.'],[
+    {label:'2025 Annual Total', data:[53,34,42,21], backgroundColor:['rgba(124,58,237,0.85)','rgba(124,58,237,0.6)','rgba(124,58,237,0.4)','rgba(124,58,237,0.2)'], borderRadius:6},
+  ],{legend:false});
+
+  // Render table
+  const tbody = document.getElementById('maps-table-body');
+  if (tbody) {
+    tbody.innerHTML = MAPS_TABLE.map(r=>`<tr>
+      <td><span class="q-cat ${r.cat}">${r.stage}</span></td>
+      <td style="font-weight:600">${r.metric}</td>
+      <td class="${r.Q1 != null ? 'q-val' : 'q-val none'}">${r.Q1 != null ? fmt(r.Q1) : '—'}</td>
+      <td class="${r.Q2 != null ? 'q-val' : 'q-val none'}">${r.Q2 != null ? fmt(r.Q2) : '—'}</td>
+      <td class="${r.Q3 != null ? 'q-val' : 'q-val none'}">${r.Q3 != null ? fmt(r.Q3) : '—'}</td>
+      <td class="${r.Q4 != null ? 'q-val' : 'q-val none'}">${r.Q4 != null ? fmt(r.Q4) : '—'}</td>
+      <td style="font-weight:800; color:#1a2b4a; background:#f0f4ff;">${r.annual != null ? fmt(r.annual) : '—'}</td>
+      <td class="q-owner">${r.owner}</td>
+    </tr>`).join('');
+  }
+}
+
+function renderDigitalCharts() {
+  mkChart('chartFB','bar',['Q1','Q2','Q3'],[
+    {label:'Views (÷100)', data:[657,902,680], backgroundColor:'rgba(37,99,235,0.7)', borderRadius:6, yAxisID:'y'},
+    {label:'New Followers', data:[31,60,74], backgroundColor:'rgba(16,185,129,0.7)', borderRadius:6, yAxisID:'y'},
+    {label:'Reactions', data:[653,1171,2192], backgroundColor:'rgba(245,158,11,0.5)', borderRadius:6, yAxisID:'y'},
+  ],{extra:{plugins:{tooltip:{callbacks:{label:(c)=>{
+    if(c.datasetIndex===0) return ` Views: ${(c.raw*100).toLocaleString()}`;
+    return ` ${c.dataset.label}: ${c.raw}`;
+  }}}}}});
+
+  mkChart('chartYT','bar',['Q1','Q2','Q3'],[
+    {label:'Views', data:[7300,7900,8900], backgroundColor:'rgba(220,38,38,0.6)', borderRadius:6},
+    {label:'Subscribers', data:[72,97,125], backgroundColor:'rgba(220,38,38,0.3)', borderRadius:6},
+  ],{});
+
+  mkChart('chartMonConnect','bar',['Q1','Q2','Q3'],[{
+    label:'Monday Connect Sign-ups', data:[232,463,152],
+    backgroundColor:['rgba(37,99,235,0.7)','rgba(16,185,129,0.7)','rgba(245,158,11,0.7)'], borderRadius:8
+  }],{legend:false});
+}
+
+// ═══════════════════════════ NAV ════════════════════════════════════════════
+function showTab(tab) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('page-'+tab).classList.add('active');
+
+  // Render charts for the shown tab
+  setTimeout(() => {
+    if (tab==='overview')    renderOverviewCharts();
+    if (tab==='attendance')  renderAttendanceCharts();
+    if (tab==='giving')      renderGivingCharts();
+    if (tab==='maps')        renderMAPSCharts();
+    if (tab==='digital')     renderDigitalCharts();
+  }, 50);
+}
+
+function setYear(y) {
+  currentYear = y;
+  document.querySelectorAll('.year-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  renderKPIs();
+  renderOverviewCharts();
+  // Also refresh year-aware charts if their tab is currently visible
+  if (document.getElementById('page-attendance')?.classList.contains('active')) renderAttendanceCharts();
+  if (document.getElementById('page-giving')?.classList.contains('active'))     renderGivingCharts();
+}
+
+// ═══════════════════════════ INIT ════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  // Render immediately with hardcoded defaults, then silently refresh with live data
+  renderKPIs();
+  renderOverviewCharts();
+  loadLiveData(); // async — updates charts in the background once sheet data arrives
+});
+</script>
+</body>
+</html>
