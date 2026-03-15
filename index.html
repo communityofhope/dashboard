@@ -607,7 +607,7 @@ const OFF_BREAKDOWN = {"General / Flourish":2869508,"Español":158559,"Love the 
 
 const MAPS_TABLE = [
   // ── DISINTERESTED ─────────────────────────────────────────────────────────
-  {stage:"Disinterested",cat:"dis",metric:"Support Groups (participants)",Q1:44,Q2:43,Q3:24,Q4:127,annual:96,owner:"Jeff"},
+  {stage:"Disinterested",cat:"dis",metric:"Support Groups (participants)",Q1:44,Q2:43,Q3:24,Q4:127,annual:96.owner:"Jeff"},
   {stage:"Disinterested",cat:"dis",metric:"Social Media Engagement",Q1:null,Q2:null,Q3:null,Q4:null,annual:null,owner:"Maddie"},
   {stage:"Disinterested",cat:"dis",metric:"Community-Wide Events & Gatherings",Q1:null,Q2:null,Q3:null,Q4:null,annual:null,owner:"Fam Min"},
   {stage:"Disinterested",cat:"dis",metric:"Servant Evangelism",Q1:null,Q2:null,Q3:null,Q4:null,annual:null,owner:"Stacey"},
@@ -865,38 +865,68 @@ function renderKPIs() {
       </div>`;
   }
 
-  // Giving page KPIs
+  // Giving page KPIs — year-aware
   const kpiGiving = document.getElementById('kpi-giving');
   if (kpiGiving) {
     const totalGiving25 = sum(vals(OFF_25)) + GIVING_ADJ_25;
     const avgWeeklyGiving25 = avg(vals(OFF_25));
     const totalGiving26 = sum(vals(OFF_26));
-    kpiGiving.innerHTML = `
-      <div class="kpi-card blue"><div class="kpi-icon">💰</div>
-        <div class="kpi-label">Total Giving 2025</div>
-        <div class="kpi-value">${fmtCur(totalGiving25)}</div>
-        <div class="kpi-sub">Full year all campuses</div>
-      </div>
-      <div class="kpi-card teal"><div class="kpi-icon">📅</div>
-        <div class="kpi-label">Avg Weekly Giving 2025</div>
-        <div class="kpi-value">${fmtCur(avgWeeklyGiving25)}</div>
-        <div class="kpi-sub">Over 50 recorded weeks</div>
-      </div>
-      <div class="kpi-card amber"><div class="kpi-icon">📈</div>
-        <div class="kpi-label">2026 T1 Giving (YTD)</div>
-        <div class="kpi-value">${fmtCur(totalGiving26)}</div>
-        <div class="kpi-sub">Trimester 1 (Jan–May)</div>
-      </div>
-      <div class="kpi-card purple"><div class="kpi-icon">✝️</div>
-        <div class="kpi-label">Missions Giving 2025</div>
-        <div class="kpi-value">$36,866</div>
-        <div class="kpi-sub">Full year total</div>
-      </div>
-      <div class="kpi-card green"><div class="kpi-icon">❤️</div>
-        <div class="kpi-label">Love the 561 (2025)</div>
-        <div class="kpi-value">$100,864</div>
-        <div class="kpi-sub">Community benevolence fund</div>
-      </div>`;
+    const avgWeeklyGiving26 = avg(vals(OFF_26));
+    const weeks26 = OFF_26.length;
+    if (currentYear === 2025) {
+      kpiGiving.innerHTML = `
+        <div class="kpi-card blue"><div class="kpi-icon">💰</div>
+          <div class="kpi-label">Total Giving 2025</div>
+          <div class="kpi-value">${fmtCur(totalGiving25)}</div>
+          <div class="kpi-sub">Full year all campuses</div>
+        </div>
+        <div class="kpi-card teal"><div class="kpi-icon">📅</div>
+          <div class="kpi-label">Avg Weekly Giving 2025</div>
+          <div class="kpi-value">${fmtCur(avgWeeklyGiving25)}</div>
+          <div class="kpi-sub">Over ${OFF_25.length} recorded weeks</div>
+        </div>
+        <div class="kpi-card amber"><div class="kpi-icon">✝️</div>
+          <div class="kpi-label">Missions Giving 2025</div>
+          <div class="kpi-value">$36,866</div>
+          <div class="kpi-sub">Full year total</div>
+        </div>
+        <div class="kpi-card purple"><div class="kpi-icon">❤️</div>
+          <div class="kpi-label">Love the 561 (2025)</div>
+          <div class="kpi-value">$100,864</div>
+          <div class="kpi-sub">Community benevolence fund</div>
+        </div>
+        <div class="kpi-card green"><div class="kpi-icon">📈</div>
+          <div class="kpi-label">2026 T1 Giving (YTD)</div>
+          <div class="kpi-value">${fmtCur(totalGiving26)}</div>
+          <div class="kpi-sub">Trimester 1 · ${weeks26} weeks so far</div>
+        </div>`;
+    } else {
+      kpiGiving.innerHTML = `
+        <div class="kpi-card blue"><div class="kpi-icon">💰</div>
+          <div class="kpi-label">2026 T1 Giving (YTD)</div>
+          <div class="kpi-value">${fmtCur(totalGiving26)}</div>
+          <div class="kpi-sub">Trimester 1 · ${weeks26} weeks recorded</div>
+        </div>
+        <div class="kpi-card teal"><div class="kpi-icon">📅</div>
+          <div class="kpi-label">Avg Weekly Giving 2026</div>
+          <div class="kpi-value">${fmtCur(avgWeeklyGiving26)}</div>
+          <div class="kpi-sub">Over ${weeks26} recorded weeks</div>
+        </div>
+        <div class="kpi-card amber"><div class="kpi-icon">📊</div>
+          <div class="kpi-label">2025 Weekly Avg (benchmark)</div>
+          <div class="kpi-value">${fmtCur(avgWeeklyGiving25)}</div>
+          <div class="kpi-sub">Full year 2025 average</div>
+        </div>
+        <div class="kpi-card purple"><div class="kpi-icon">✝️</div>
+          <div class="kpi-label">Missions Giving 2026</div>
+          <div class="kpi-value">—</div>
+          <div class="kpi-sub">Data in progress</div>
+        </div>
+        <div class="kpi-card green"><div class="kpi-icon">❤️</div>
+          <div class="kpi-label">Love the 561 (2026)</div>
+          <div class="kpi-value">—</div>
+          <div class="kpi-sub">Data in progress</div>
+        </div>`;
   }
 }
 
@@ -995,6 +1025,43 @@ function renderAttendanceCharts() {
 }
 
 function renderGivingCharts() {
+  const is26 = currentYear === 2026;
+
+  // Update card titles to reflect selected year
+  const card25  = document.querySelector('#chartGiving25')?.closest('.card');
+  const card26  = document.querySelector('#chartGiving26')?.closest('.card');
+  const cardFunds = document.querySelector('#chartGivingFunds')?.closest('.card');
+  const cardBar   = document.querySelector('#chartGivingBar')?.closest('.card');
+
+  if (card25) {
+    card25.querySelector('.card-title').textContent = is26
+      ? 'Weekly Giving — 2025 Full Year (Reference)'
+      : 'Weekly Giving — 2025 Full Year';
+    card25.querySelector('.card-sub').textContent = 'Total offerings by week (all campuses combined)';
+  }
+  if (card26) {
+    card26.querySelector('.card-title').textContent = 'Weekly Giving — 2026 Trimester 1 (YTD)';
+    card26.querySelector('.card-sub').textContent = is26
+      ? 'T1: January – May 2026 (Jan–Feb data shown)'
+      : 'T1: January – May 2026 (Jan–Feb data shown)';
+  }
+  if (cardFunds) {
+    cardFunds.querySelector('.card-title').textContent = is26
+      ? 'Giving by Fund — 2025 Annual Total (Reference)'
+      : 'Giving by Fund — 2025 Annual Total';
+    cardFunds.querySelector('.card-sub').textContent = is26
+      ? '2026 fund breakdown in progress; 2025 shown for reference'
+      : 'How total giving was distributed across funds';
+  }
+  if (cardBar) {
+    cardBar.querySelector('.card-title').textContent = is26
+      ? 'Giving by Fund — Dollar Amounts (2025 Reference)'
+      : 'Giving by Fund — Dollar Amounts';
+    cardBar.querySelector('.card-sub').textContent = is26
+      ? 'Bar chart of 2025 totals (2026 fund data pending)'
+      : 'Bar chart of total per category (2025)';
+  }
+
   mkChart('chartGiving25','line', OFF_25.map(r=>r.date), [
     {label:'Weekly Giving', data:vals(OFF_25), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.07)', tension:0.35, pointRadius:2, fill:true}
   ], {currency:true, legend:false, maxTicks:18});
@@ -1059,7 +1126,7 @@ function renderMAPSCharts() {
 function renderDigitalCharts() {
   mkChart('chartFB','bar',['Q1','Q2','Q3'],[
     {label:'Views (÷100)', data:[657,902,680], backgroundColor:'rgba(37,99,235,0.7)', borderRadius:6, yAxisID:'y'},
-    {label:'New Followers', data:[31,60,74], backgroundColor:'rgba(16,185,129,0.7)', borderRadius:6, yAxisID:'y'},
+    {label:'New Followers', data:[31,60,74], backgroundColor:'rgba(16,185,129,0.7)', borderRadius:6, yAxisID:'y"},
     {label:'Reactions', data:[653,1171,2192], backgroundColor:'rgba(245,158,11,0.5)', borderRadius:6, yAxisID:'y'},
   ],{extra:{plugins:{tooltip:{callbacks:{label:(c)=>{
     if(c.datasetIndex===0) return ` Views: ${(c.raw*100).toLocaleString()}`;
