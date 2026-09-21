@@ -364,7 +364,7 @@
       <strong style="color:#059669">Interested</strong> → engaging new visitors,
       <strong style="color:#d97706">Growing Together</strong> → developing committed disciples,
       <strong style="color:#7c3aed">Fully Devoted</strong> → equipping core leaders.
-      <br><br><span style="font-size:11px; color:#94a3b8;">📋 Stage totals and annual figures sourced from 2025 Annual Report. 2025 figures shown by trimester: T1 (Jan–Apr) · T2 (May–Aug) · T3 (Sep–Dec).</span>
+      <br><br><span id="mapsSourceNote" style="font-size:11px; color:#94a3b8;"></span>
     </div>
   </div>
 
@@ -601,30 +601,30 @@ const MAPS_TABLE = [
 
 const MAPS_TABLE_26 = [
   // ── DISINTERESTED ─────────────────────────────────────────────────────────
-  {stage:"Disinterested",cat:"dis",metric:"Support Groups (participants)",T1:null,T2:null,T3:null,annual:null,owner:"Jeff"},
-  {stage:"Disinterested",cat:"dis",metric:"Social Media Engagement",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
-  {stage:"Disinterested",cat:"dis",metric:"Community-Wide Events & Gatherings",T1:null,T2:null,T3:null,annual:null,owner:"Fam Min"},
-  {stage:"Disinterested",cat:"dis",metric:"Food Distributions (individuals)",T1:null,T2:null,T3:null,annual:null,owner:"Stacey"},
+  {stage:"Disinterested",cat:"dis",metric:"Support Groups (participants)",label:"Support Groups",T1:null,T2:null,T3:null,annual:null,owner:"Jeff"},
+  {stage:"Disinterested",cat:"dis",metric:"Social Media Engagement",label:"Non-Follower Social Views (FB+IG)",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
+  {stage:"Disinterested",cat:"dis",metric:"Community-Wide Events & Gatherings",label:"Community-Wide Events and Gatherings",T1:null,T2:null,T3:null,annual:null,owner:"Fam Min"},
+  {stage:"Disinterested",cat:"dis",metric:"Food Distributions (individuals)",label:"Food Distributions (Individuals)",T1:null,T2:null,T3:null,annual:null,owner:"Stacey"},
   // ── INTERESTED ────────────────────────────────────────────────────────────
-  {stage:"Interested",cat:"int",metric:"Avg Weekly Attendance (all campuses)",T1:null,T2:null,T3:null,annual:null,owner:"Trevor"},
-  {stage:"Interested",cat:"int",metric:"Open House Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
-  {stage:"Interested",cat:"int",metric:"Next Steps Forms",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
-  {stage:"Interested",cat:"int",metric:"Digital Connect Cards",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
-  {stage:"Interested",cat:"int",metric:"Alpha Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Jessica"},
-  {stage:"Interested",cat:"int",metric:"Monday Connect Sign-ups",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
-  {stage:"Interested",cat:"int",metric:"New Follows on Social",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
-  {stage:"Interested",cat:"int",metric:"App Downloads (New COH App)",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
+  {stage:"Interested",cat:"int",metric:"Avg Weekly Attendance (all campuses)",label:"Avg. Weekly Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Trevor"},
+  {stage:"Interested",cat:"int",metric:"Open House Attendance",label:"Open House Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
+  {stage:"Interested",cat:"int",metric:"Next Steps Forms",label:"Next Steps Forms",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
+  {stage:"Interested",cat:"int",metric:"Digital Connect Cards",label:"Digital Connect Cards",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
+  {stage:"Interested",cat:"int",metric:"Alpha Attendance",label:"Alpha Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Jessica"},
+  {stage:"Interested",cat:"int",metric:"Monday Connect Sign-ups",label:"Monday Connect Sign-ups (LOX + LW)",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
+  {stage:"Interested",cat:"int",metric:"New Follows on Social",label:"Follows on Social (Main IG + FB)",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
+  {stage:"Interested",cat:"int",metric:"App Downloads (New COH App)",label:"App Downloads (All Church)",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
   // ── GROWING TOGETHER ──────────────────────────────────────────────────────
-  {stage:"Growing Together",cat:"grow",metric:"New Partners",T1:null,T2:null,T3:null,annual:null,owner:"Cindy/Susan/Carmen"},
-  {stage:"Growing Together",cat:"grow",metric:"Baptisms",T1:null,T2:null,T3:null,annual:null,owner:"Cindy/Susan/Carmen"},
-  {stage:"Growing Together",cat:"grow",metric:"New Giving Units",T1:null,T2:null,T3:null,annual:null,owner:"Craig"},
-  {stage:"Growing Together",cat:"grow",metric:"New Volunteers",T1:null,T2:null,T3:null,annual:null,owner:"TBD"},
-  {stage:"Growing Together",cat:"grow",metric:"Groups & Course Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Cindy/Susan/Carmen"},
+  {stage:"Growing Together",cat:"grow",metric:"New Partners",label:"New Partners",T1:null,T2:null,T3:null,annual:null,owner:"Cindy/Susan/Carmen"},
+  {stage:"Growing Together",cat:"grow",metric:"Baptisms",label:"Baptisms",T1:null,T2:null,T3:null,annual:null,owner:"Cindy/Susan/Carmen"},
+  {stage:"Growing Together",cat:"grow",metric:"New Giving Units",label:"New Giving Units",T1:null,T2:null,T3:null,annual:null,owner:"Craig"},
+  {stage:"Growing Together",cat:"grow",metric:"New Volunteers",label:"New Volunteers",T1:null,T2:null,T3:null,annual:null,owner:"TBD"},
+  {stage:"Growing Together",cat:"grow",metric:"Groups & Course Attendance",label:"Groups and Course Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Cindy/Susan/Carmen"},
   // ── FULLY DEVOTED ─────────────────────────────────────────────────────────
-  {stage:"Fully Devoted",cat:"dev",metric:"Discipleship Bands",T1:null,T2:null,T3:null,annual:null,owner:"Jessica"},
-  {stage:"Fully Devoted",cat:"dev",metric:"COH YTH Leadership",T1:null,T2:null,T3:null,annual:null,owner:"TJ"},
-  {stage:"Fully Devoted",cat:"dev",metric:"CR Sponsor Relationships",T1:null,T2:null,T3:null,annual:null,owner:"Trevor"},
-  {stage:"Fully Devoted",cat:"dev",metric:"CR Step Studies",T1:null,T2:null,T3:null,annual:null,owner:"Trevor"},
+  {stage:"Fully Devoted",cat:"dev",metric:"Discipleship Bands",label:"Discipleship Bands",T1:null,T2:null,T3:null,annual:null,owner:"Jessica"},
+  {stage:"Fully Devoted",cat:"dev",metric:"COH YTH Leadership",label:"COH YTH Leadership",T1:null,T2:null,T3:null,annual:null,owner:"TJ"},
+  {stage:"Fully Devoted",cat:"dev",metric:"CR Sponsor Relationships",label:"CR Sponsor Relationships",T1:null,T2:null,T3:null,annual:null,owner:"Trevor"},
+  {stage:"Fully Devoted",cat:"dev",metric:"CR Step Studies",label:"CR Step Studies",T1:null,T2:null,T3:null,annual:null,owner:"Trevor"},
 ];
 
 // ═══════════════════════════ STATE ══════════════════════════════════════════
@@ -706,6 +706,12 @@ let LOX_8_26  = [];
 let LOX_10_26 = [];
 let LOX_11_26 = [];
 
+// The source sheet has a couple of misspellings — correct them for display only
+const SHEET_TYPOS = { 'Avg. Weekly Attendnace':'Avg. Weekly Attendance',
+                      'Open House Attendnace':'Open House Attendance',
+                      'Next steps forms':'Next Steps Forms' };
+const fixSheetTypos = s => SHEET_TYPOS[s] || s;
+
 // Metrics that are averages — annual is the mean of filled trimesters, not the sum
 const AVG_METRICS = new Set(['Avg Weekly Attendance (all campuses)']);
 
@@ -755,6 +761,8 @@ function parseTotalsSheet(rows) {
     if (mapsName) {
       const entry = MAPS_TABLE_26.find(r => r.metric === mapsName);
       if (entry) {
+        // Display the sheet's own column-A wording so labels never drift
+        if (row[0] && row[0].trim()) entry.label = fixSheetTypos(row[0].trim());
         if (t1 != null) entry.T1 = t1;
         if (t2 != null) entry.T2 = t2;
         if (t3 != null) entry.T3 = t3;
@@ -1203,6 +1211,13 @@ function renderGivingCharts() {
 function renderMAPSFunnel() {
   const is26 = currentYear === 2026;
   const tbl  = is26 ? MAPS_TABLE_26 : MAPS_TABLE;
+
+  const note = document.getElementById('mapsSourceNote');
+  if (note) {
+    note.textContent = is26
+      ? '📋 Live from the 2026 Metrics Reporting sheet (TOTALS tab). Stage totals are the sheet\u2019s own totals. Trimesters: T1 (Jan–Apr) · T2 (May–Aug) · T3 (Sep–Dec).'
+      : '📋 Stage totals and annual figures sourced from the 2025 Annual Report. Trimesters: T1 (Jan–Apr) · T2 (May–Aug) · T3 (Sep–Dec).';
+  }
   ['dis','int','grow','dev'].forEach(cat => {
     const el = document.getElementById('maps-funnel-' + cat);
     if (!el) return;
@@ -1211,7 +1226,7 @@ function renderMAPSFunnel() {
               : [r.T1,r.T2,r.T3].some(x => x != null)
                 ? [r.T1,r.T2,r.T3].reduce((a,b) => a + (b||0), 0)
                 : null;
-      return `<div class="maps-metric"><span class="maps-metric-name">${r.metric}</span>`
+      return `<div class="maps-metric"><span class="maps-metric-name">${r.label || r.metric}</span>`
            + `<span class="maps-metric-value">${v != null ? fmt(v) : '—'}</span></div>`;
     }).join('');
     let tsum = null;
@@ -1277,7 +1292,7 @@ function renderMAPSCharts() {
   if (tbody) {
     tbody.innerHTML = tbl.map(r=>`<tr>
       <td><span class="q-cat ${r.cat}">${r.stage}</span></td>
-      <td style="font-weight:600">${r.metric}</td>
+      <td style="font-weight:600">${r.label || r.metric}</td>
       <td class="${r.T1 != null ? 'q-val' : 'q-val none'}">${r.T1 != null ? fmt(r.T1) : '—'}</td>
       <td class="${r.T2 != null ? 'q-val' : 'q-val none'}">${r.T2 != null ? fmt(r.T2) : '—'}</td>
       <td class="${r.T3 != null ? 'q-val' : 'q-val none'}">${r.T3 != null ? fmt(r.T3) : '—'}</td>
