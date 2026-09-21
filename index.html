@@ -611,14 +611,12 @@ const MAPS_TABLE = [
   {stage:"Disinterested",cat:"dis",metric:"Support Groups (participants)",T1:44,T2:43,T3:127,annual:96,owner:"Jeff"},
   {stage:"Disinterested",cat:"dis",metric:"Social Media Engagement",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
   {stage:"Disinterested",cat:"dis",metric:"Community-Wide Events & Gatherings",T1:null,T2:null,T3:null,annual:null,owner:"Fam Min"},
-  {stage:"Disinterested",cat:"dis",metric:"Servant Evangelism",T1:null,T2:null,T3:null,annual:null,owner:"Stacey"},
   {stage:"Disinterested",cat:"dis",metric:"Food Distributions (individuals)",T1:4258,T2:3765,T3:3208,annual:14821,owner:"Stacey"},
   // ── INTERESTED ────────────────────────────────────────────────────────────
   {stage:"Interested",cat:"int",metric:"Avg Weekly Attendance (all campuses)",T1:null,T2:null,T3:null,annual:2262,owner:"Trevor"},
   {stage:"Interested",cat:"int",metric:"Open House Attendance",T1:null,T2:null,T3:12,annual:29,owner:"Beth"},
   {stage:"Interested",cat:"int",metric:"Next Steps Forms",T1:2,T2:3,T3:4,annual:11,owner:"Beth"},
   {stage:"Interested",cat:"int",metric:"Digital Connect Cards",T1:18,T2:40,T3:82,annual:210,owner:"Beth"},
-  {stage:"Interested",cat:"int",metric:"Welcome Bags",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
   {stage:"Interested",cat:"int",metric:"Alpha Attendance",T1:null,T2:null,T3:70,annual:69,owner:"Jessica"},
   {stage:"Interested",cat:"int",metric:"Monday Connect Sign-ups",T1:232,T2:463,T3:152,annual:847,owner:"Maddie"},
   {stage:"Interested",cat:"int",metric:"New Follows on Social",T1:31,T2:60,T3:74,annual:165,owner:"Maddie"},
@@ -643,14 +641,12 @@ const MAPS_TABLE_26 = [
   {stage:"Disinterested",cat:"dis",metric:"Support Groups (participants)",T1:null,T2:null,T3:null,annual:null,owner:"Jeff"},
   {stage:"Disinterested",cat:"dis",metric:"Social Media Engagement",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
   {stage:"Disinterested",cat:"dis",metric:"Community-Wide Events & Gatherings",T1:null,T2:null,T3:null,annual:null,owner:"Fam Min"},
-  {stage:"Disinterested",cat:"dis",metric:"Servant Evangelism",T1:null,T2:null,T3:null,annual:null,owner:"Stacey"},
   {stage:"Disinterested",cat:"dis",metric:"Food Distributions (individuals)",T1:null,T2:null,T3:null,annual:null,owner:"Stacey"},
   // ── INTERESTED ────────────────────────────────────────────────────────────
   {stage:"Interested",cat:"int",metric:"Avg Weekly Attendance (all campuses)",T1:null,T2:null,T3:null,annual:null,owner:"Trevor"},
   {stage:"Interested",cat:"int",metric:"Open House Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
   {stage:"Interested",cat:"int",metric:"Next Steps Forms",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
   {stage:"Interested",cat:"int",metric:"Digital Connect Cards",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
-  {stage:"Interested",cat:"int",metric:"Welcome Bags",T1:null,T2:null,T3:null,annual:null,owner:"Beth"},
   {stage:"Interested",cat:"int",metric:"Alpha Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Jessica"},
   {stage:"Interested",cat:"int",metric:"Monday Connect Sign-ups",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
   {stage:"Interested",cat:"int",metric:"New Follows on Social",T1:null,T2:null,T3:null,annual:null,owner:"Maddie"},
@@ -661,8 +657,6 @@ const MAPS_TABLE_26 = [
   {stage:"Growing Together",cat:"grow",metric:"New Giving Units",T1:null,T2:null,T3:null,annual:null,owner:"Craig"},
   {stage:"Growing Together",cat:"grow",metric:"New Volunteers",T1:null,T2:null,T3:null,annual:null,owner:"TBD"},
   {stage:"Growing Together",cat:"grow",metric:"Groups & Course Attendance",T1:null,T2:null,T3:null,annual:null,owner:"Cindy/Susan/Carmen"},
-  {stage:"Growing Together",cat:"grow",metric:"Active Small Groups",T1:null,T2:null,T3:null,annual:null,owner:"Jessica"},
-  {stage:"Growing Together",cat:"grow",metric:"Freedom Course",T1:null,T2:null,T3:null,annual:null,owner:"Trevor"},
   // ── FULLY DEVOTED ─────────────────────────────────────────────────────────
   {stage:"Fully Devoted",cat:"dev",metric:"Discipleship Bands",T1:null,T2:null,T3:null,annual:null,owner:"Jessica"},
   {stage:"Fully Devoted",cat:"dev",metric:"COH YTH Leadership",T1:null,T2:null,T3:null,annual:null,owner:"TJ"},
@@ -733,6 +727,11 @@ let COMMS_26 = {
 
 // Food distributions 2026 from TOTALS tab — overwritten on live load
 let FOOD_DIST_26 = { T1: 7442, T2: 6609, T3: null };
+
+// 2026 Loxahatchee service-time breakdowns (populated from live fetch)
+let LOX_8_26  = [];
+let LOX_10_26 = [];
+let LOX_11_26 = [];
 
 // Map TOTALS sheet canonical names (col G, lowercase) → MAPS_TABLE_26 metric
 const TOTALS_TO_MAPS = {
@@ -905,6 +904,9 @@ async function loadLiveData() {
     const cr26 = sheetExtract(rows26, 'Loxahatchee', 'Service Attendance - CR Attendance'); if (cr26) CR_26   = cr26;
     const y26  = sheetExtract(rows26, 'Loxahatchee', 'Service Attendance - COH YTH');       if (y26)  YTH_26  = y26;
     const off26= sheetExtract(rows26, 'All',         'TOTAL Offering', 'TOTAL OFFERING');   if (off26) OFF_26 = off26;
+    const l8_26  = sheetExtract(rows26, 'Loxahatchee', 'Service Attendance - Sunday 8:30');   if (l8_26)  LOX_8_26  = l8_26;
+    const l10_26 = sheetExtract(rows26, 'Loxahatchee', 'Service Attendance - Sunday 10:00');  if (l10_26) LOX_10_26 = l10_26;
+    const l11_26 = sheetExtract(rows26, 'Loxahatchee', 'Service Attendance - Sunday 11:30');  if (l11_26) LOX_11_26 = l11_26;
 
     // 2026 Connect Cards YTD (sum all weekly values)
     const ccRow = rows26.find(r => r[0] === 'All' && r[1] === 'Total Connect Cards filled out');
@@ -1093,7 +1095,7 @@ function renderOverviewCharts() {
   const labelsAll = ATT_25.map(r=>r.date); // use 2025 as X axis
   mkChart('chartAttTrend','line', labelsAll, [
     {label:'2025 Attendance', data: ATT_25.map(r=>r.value), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.08)', tension:0.35, pointRadius:2, fill:true},
-    {label:'2026 Attendance (same X axis position)', data: [...ATT_26.map(r=>r.value), ...Array(labelsAll.length - ATT_26.length).fill(null)], borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.08)', tension:0.35, pointRadius:3, fill:false, borderDash:[6,3]},
+    {label:'2026 Attendance', data: labelsAll.map((_,i)=>ATT_26[i]?.value??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.08)', tension:0.35, pointRadius:3, fill:false, borderDash:[6,3]},
   ], {legend:true, maxTicks:26});
 
   // Offering trend
@@ -1117,19 +1119,19 @@ function renderAttendanceCharts() {
   // Uses 2025 date labels as X-axis; 2026 data plotted at matching positions
   function mkYoY(id, d25, d26, color) {
     const labels = d25.map(r=>r.date);
-    const map26  = Object.fromEntries(d26.map(r=>[r.date, r.value]));
+    // Align by week index — 2025/2026 Sundays fall on different calendar dates
     mkChart(id,'line', labels, [
       {label:'2025', data:vals(d25), borderColor:color, backgroundColor:color.replace('1)','0.08)'), tension:0.35, pointRadius:2, fill:true},
-      {label:'2026 YTD', data:labels.map(d=>map26[d]??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.08)', tension:0.35, pointRadius:3, fill:false, borderDash:[6,3], spanGaps:false},
+      {label:'2026 YTD', data:labels.map((_,i)=>d26[i]?.value??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.08)', tension:0.35, pointRadius:3, fill:false, borderDash:[6,3], spanGaps:false},
     ], {maxTicks:18, extra:{plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:10}}}}}});
   }
 
   // ── Combined overview (all campuses, 2025 vs 2026) ─────────────────────
   const attLabels = ATT_25.map(r=>r.date);
-  const att26Map  = Object.fromEntries(ATT_26.map(r=>[r.date, r.value]));
+  // Align 2026 by week index — Sundays differ year to year
   mkChart('chartCampusWeekly','line', attLabels, [
     {label:'2025 Total', data:vals(ATT_25), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.07)', tension:0.35, pointRadius:2, fill:true},
-    {label:'2026 YTD',  data:attLabels.map(d=>att26Map[d]??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.07)', tension:0.35, pointRadius:3, fill:false, borderDash:[6,3], spanGaps:false},
+    {label:'2026 YTD',  data:attLabels.map((_,i)=>ATT_26[i]?.value??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.07)', tension:0.35, pointRadius:3, fill:false, borderDash:[6,3], spanGaps:false},
   ], {maxTicks:26, extra:{plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11}}}}}});
 
   // ── Per-campus YoY charts ──────────────────────────────────────────────
@@ -1150,27 +1152,33 @@ function renderAttendanceCharts() {
   }],{legend:false});
 
   // ── Loxahatchee service time avg bars ─────────────────────────────────
+  const lox8Data  = is26 ? LOX_8_26  : LOX_8;
+  const lox10Data = is26 ? LOX_10_26 : LOX_10;
+  const lox11Data = is26 ? LOX_11_26 : LOX_11;
   mkChart('chartServiceTimes','bar',['8:30 AM','10:00 AM','11:30 AM'],[{
     label: is26 ? 'Avg Attendance (2026 YTD)' : 'Avg Attendance (2025)',
-    data: is26 ? [null,null,null] : [avg(vals(LOX_8)), avg(vals(LOX_10)), avg(vals(LOX_11))],
+    data: [lox8Data.length ? avg(vals(lox8Data)) : null,
+           lox10Data.length ? avg(vals(lox10Data)) : null,
+           lox11Data.length ? avg(vals(lox11Data)) : null],
     backgroundColor:['#2563eb','#10b981','#f59e0b'], borderRadius:8, barThickness:48
   }],{legend:false});
 
   // ── Lake Worth service time placeholder ───────────────────────────────
   mkChart('chartLWTimes','bar',['10:00 AM','11:30 AM'],[{
-    label:'Data coming soon', data:[null,null],
+    label:`Avg Attendance (${yr})`, data:[null,null],
     backgroundColor:['#10b981','#059669'], borderRadius:8, barThickness:48
   }],{legend:false});
 
-  // ── Loxahatchee weekly service time lines (2025 only) ─────────────────
-  if (!is26) {
-    const lineLabels = LOX_8.map(r=>r.date);
-    const l10Map = Object.fromEntries(LOX_10.map(r=>[r.date,r.value]));
-    const l11Map = Object.fromEntries(LOX_11.map(r=>[r.date,r.value]));
+  // ── Loxahatchee weekly service time lines ─────────────────────────────
+  const lineBase = is26 ? lox8Data : LOX_8;
+  if (lineBase.length) {
+    const lineLabels = lineBase.map(r=>r.date);
+    const l10Arr = is26 ? lox10Data : LOX_10;
+    const l11Arr = is26 ? lox11Data : LOX_11;
     mkChart('chartServiceLine','line', lineLabels, [
-      {label:'8:30 AM',  data:vals(LOX_8), borderColor:'#2563eb', tension:0.35, pointRadius:1, fill:false},
-      {label:'10:00 AM', data:lineLabels.map(d=>l10Map[d]||null), borderColor:'#10b981', tension:0.35, pointRadius:1, fill:false, spanGaps:true},
-      {label:'11:30 AM', data:lineLabels.map(d=>l11Map[d]||null), borderColor:'#f59e0b', tension:0.35, pointRadius:1, fill:false, spanGaps:true},
+      {label:'8:30 AM',  data:vals(lineBase), borderColor:'#2563eb', tension:0.35, pointRadius:1, fill:false},
+      {label:'10:00 AM', data:lineLabels.map((_,i)=>l10Arr[i]?.value??null), borderColor:'#10b981', tension:0.35, pointRadius:1, fill:false, spanGaps:true},
+      {label:'11:30 AM', data:lineLabels.map((_,i)=>l11Arr[i]?.value??null), borderColor:'#f59e0b', tension:0.35, pointRadius:1, fill:false, spanGaps:true},
     ], {maxTicks:20});
   } else {
     if (charts['chartServiceLine']) { charts['chartServiceLine'].destroy(); delete charts['chartServiceLine']; }
@@ -1183,10 +1191,10 @@ function renderGivingCharts() {
   // ── Combined YoY weekly giving chart ──────────────────────────────────
   // Use 2025 date labels as X-axis; 2026 plotted at matching positions
   const gLabels = OFF_25.map(r=>r.date);
-  const gMap26  = Object.fromEntries(OFF_26.map(r=>[r.date, r.value]));
+  // Align 2026 by week index — Sunday dates differ year to year
   mkChart('chartGivingYoY','line', gLabels, [
     {label:'2025', data:vals(OFF_25), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.07)', tension:0.35, pointRadius:2, fill:true},
-    {label:'2026 YTD', data:gLabels.map(d=>gMap26[d]??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.07)', tension:0.35, pointRadius:4, fill:false, borderDash:[6,3], spanGaps:false},
+    {label:'2026 YTD', data:gLabels.map((_,i)=>OFF_26[i]?.value??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.07)', tension:0.35, pointRadius:4, fill:false, borderDash:[6,3], spanGaps:false},
   ], {currency:true, maxTicks:18, extra:{plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11}}}}}});
 
   // ── Fund breakdown charts ──────────────────────────────────────────────
@@ -1235,8 +1243,8 @@ function renderMAPSCharts() {
   ],{extra:{plugins:{legend:{display:true}}}});
 
   // Growing Together — annual totals
-  mkChart('chartMapsG','bar',['New Partners','Baptisms','Groups & Courses','Freedom Course'],[
-    {label:`${yr} Annual`, data:[getRow('New Partners').annual??null, getRow('Baptisms').annual??null, getRow('Groups & Course Attendance').annual??null, getRow('Freedom Course').annual??null], backgroundColor:['rgba(245,158,11,0.8)','rgba(245,158,11,0.6)','rgba(245,158,11,0.4)','rgba(245,158,11,0.25)'], borderRadius:6}
+  mkChart('chartMapsG','bar',['New Partners','Baptisms','Groups & Courses','New Volunteers'],[
+    {label:`${yr} Annual`, data:[getRow('New Partners').annual??null, getRow('Baptisms').annual??null, getRow('Groups & Course Attendance').annual??null, getRow('New Volunteers').annual??null], backgroundColor:['rgba(245,158,11,0.8)','rgba(245,158,11,0.6)','rgba(245,158,11,0.4)','rgba(245,158,11,0.25)'], borderRadius:6}
   ],{legend:false});
 
   // Fully Devoted — annual totals
