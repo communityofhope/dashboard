@@ -176,8 +176,8 @@
     </div>
   </div>
   <div class="header-controls">
-    <button class="year-btn active" onclick="setYear(2025)">2025</button>
-    <button class="year-btn" onclick="setYear(2026)">2026</button>
+    <button class="year-btn" onclick="setYear(2025)">2025</button>
+    <button class="year-btn active" onclick="setYear(2026)">2026</button>
     <span id="data-badge" style="font-size:11px; color:#94a3b8; margin-left:8px; white-space:nowrap;">⏳ Loading…</span>
   </div>
 </header>
@@ -229,36 +229,74 @@
 
   <div class="kpi-row" id="kpi-att"></div>
 
-  <!-- Campus comparison -->
+  <!-- All campuses combined (overview) -->
   <div class="card">
-    <div class="card-title">Weekly Attendance by Campus</div>
-    <div class="card-sub" id="campus-sub">Loxahatchee vs. Lake Worth — weekly totals</div>
-    <div class="legend-row">
-      <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>Loxahatchee</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Lake Worth</div>
-    </div>
-    <canvas id="chartCampusWeekly" style="max-height:300px"></canvas>
+    <div class="card-title">All Campuses — Combined Weekly (2025 vs 2026)</div>
+    <div class="card-sub" id="campus-sub">Total attendance across all expressions — year-over-year</div>
+    <canvas id="chartCampusWeekly" style="max-height:240px"></canvas>
   </div>
 
+  <!-- Per-campus YoY charts: row 1 -->
   <div class="chart-grid-2">
-    <!-- Service times -->
     <div class="card">
-      <div class="card-title">Loxahatchee — Service Time Breakdown (2025)</div>
-      <div class="card-sub">Average attendance by service time</div>
+      <div class="card-title" id="titleLox">Loxahatchee — Year Over Year</div>
+      <div class="card-sub">2025 full year vs 2026 YTD (same calendar position)</div>
+      <canvas id="chartLox" style="max-height:220px"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title" id="titleLW">Lake Worth — Year Over Year</div>
+      <div class="card-sub">2025 full year vs 2026 YTD (same calendar position)</div>
+      <canvas id="chartLW" style="max-height:220px"></canvas>
+    </div>
+  </div>
+
+  <!-- Per-campus YoY charts: row 2 -->
+  <div class="chart-grid-2">
+    <div class="card">
+      <div class="card-title" id="titleEsp">COH Español — Year Over Year</div>
+      <div class="card-sub">2025 full year vs 2026 YTD</div>
+      <canvas id="chartEsp" style="max-height:220px"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title" id="titleYth">COH Youth — Year Over Year</div>
+      <div class="card-sub">2025 full year vs 2026 YTD</div>
+      <canvas id="chartYth" style="max-height:220px"></canvas>
+    </div>
+  </div>
+
+  <!-- Per-campus YoY charts: row 3 -->
+  <div class="chart-grid-2">
+    <div class="card">
+      <div class="card-title" id="titleCR">Celebrate Recovery — Year Over Year</div>
+      <div class="card-sub">2025 full year vs 2026 YTD</div>
+      <canvas id="chartCR" style="max-height:220px"></canvas>
+    </div>
+    <!-- Ministry avg bars -->
+    <div class="card">
+      <div class="card-title" id="titleMinistry">Ministry Avg Weekly Attendance</div>
+      <div class="card-sub" id="subMinistry">Average per expression</div>
+      <canvas id="chartMinistry" style="max-height:220px"></canvas>
+    </div>
+  </div>
+
+  <!-- Service time breakdowns -->
+  <div class="chart-grid-2">
+    <div class="card">
+      <div class="card-title" id="titleServiceTimes">Loxahatchee — Service Time Avg</div>
+      <div class="card-sub">Average attendance by service time (8:30 · 10:00 · 11:30)</div>
       <canvas id="chartServiceTimes"></canvas>
     </div>
-    <!-- Ministry attendance -->
     <div class="card">
-      <div class="card-title">Ministry Attendance Trends (2025)</div>
-      <div class="card-sub">Celebrate Recovery · Youth · Children · Online</div>
-      <canvas id="chartMinistry"></canvas>
+      <div class="card-title">Lake Worth — Service Time Avg</div>
+      <div class="card-sub">Average attendance by service time (data coming soon)</div>
+      <canvas id="chartLWTimes"></canvas>
     </div>
   </div>
 
-  <!-- Service time detail chart -->
+  <!-- Loxahatchee service time detail -->
   <div class="card">
-    <div class="card-title">Loxahatchee — Weekly by Service Time (2025)</div>
-    <div class="card-sub">8:30 AM · 10:00 AM · 11:30 AM side-by-side</div>
+    <div class="card-title" id="titleServiceLine">Loxahatchee — Weekly by Service Time</div>
+    <div class="card-sub">8:30 AM · 10:00 AM · 11:30 AM week-by-week</div>
     <div class="legend-row">
       <div class="legend-item"><div class="legend-dot" style="background:#2563eb"></div>8:30 AM</div>
       <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>10:00 AM</div>
@@ -295,17 +333,10 @@
 
   <div class="kpi-row" id="kpi-giving"></div>
 
-  <div class="chart-grid-2">
-    <div class="card">
-      <div class="card-title">Weekly Giving — 2025 Full Year</div>
-      <div class="card-sub">Total offerings by week (all campuses combined)</div>
-      <canvas id="chartGiving25"></canvas>
-    </div>
-    <div class="card">
-      <div class="card-title">Weekly Giving — 2026 Trimester 1 (YTD)</div>
-      <div class="card-sub">T1: January – May 2026 (Jan–Feb data shown)</div>
-      <canvas id="chartGiving26"></canvas>
-    </div>
+  <div class="card">
+    <div class="card-title" id="titleGivingYoY">Weekly Giving — 2025 vs 2026 Year Over Year</div>
+    <div class="card-sub">2025 full year (blue) · 2026 YTD (orange) — same calendar position</div>
+    <canvas id="chartGivingYoY" style="max-height:260px"></canvas>
   </div>
 
   <div class="chart-grid-2">
@@ -450,56 +481,63 @@
 <!-- ════════════════════════════════ PAGE: DIGITAL ══════════════════════════ -->
 <div id="page-digital" class="page">
 
-  <div class="kpi-row">
+  <div class="kpi-row" id="kpi-digital">
     <div class="kpi-card teal">
       <div class="kpi-icon">📸</div>
-      <div class="kpi-label">IG Followers (2025)</div>
-      <div class="kpi-value">2,650</div>
-      <div class="kpi-sub">COH Main — +10% YoY</div>
+      <div class="kpi-label" id="dkpi-ig-label">IG New Followers (2026 T1–T2)</div>
+      <div class="kpi-value" id="dkpi-ig-val">380</div>
+      <div class="kpi-sub" id="dkpi-ig-sub">COH Main — T1: 169 · T2: 211</div>
     </div>
     <div class="kpi-card blue">
       <div class="kpi-icon">▶️</div>
-      <div class="kpi-label">YT Views (2025 Annual)</div>
-      <div class="kpi-value">33,500</div>
-      <div class="kpi-sub">COH Main YouTube</div>
+      <div class="kpi-label" id="dkpi-yt-label">YT Views (2026 T1–T2)</div>
+      <div class="kpi-value" id="dkpi-yt-val">25,000</div>
+      <div class="kpi-sub" id="dkpi-yt-sub">COH Main YouTube YTD</div>
     </div>
     <div class="kpi-card amber">
-      <div class="kpi-icon">📺</div>
-      <div class="kpi-label">CR YT Views (2025)</div>
-      <div class="kpi-value">53,764</div>
-      <div class="kpi-sub">Celebrate Recovery channel</div>
+      <div class="kpi-icon">📘</div>
+      <div class="kpi-label" id="dkpi-fb-label">FB Views (2026 T1–T2)</div>
+      <div class="kpi-value" id="dkpi-fb-val">182,185</div>
+      <div class="kpi-sub" id="dkpi-fb-sub">COH Main Facebook YTD</div>
     </div>
     <div class="kpi-card purple">
-      <div class="kpi-icon">📱</div>
-      <div class="kpi-label">New App Downloads</div>
-      <div class="kpi-value">419</div>
-      <div class="kpi-sub">New COH Mobile App 2025</div>
+      <div class="kpi-icon">💬</div>
+      <div class="kpi-label" id="dkpi-ig2-label">IG Interactions (2026 T1–T2)</div>
+      <div class="kpi-value" id="dkpi-ig2-val">13,300</div>
+      <div class="kpi-sub" id="dkpi-ig2-sub">T1: 5,700 · T2: 7,600</div>
     </div>
     <div class="kpi-card rose">
-      <div class="kpi-icon">⏱️</div>
-      <div class="kpi-label">YT Hours Watched</div>
-      <div class="kpi-value">10,200</div>
-      <div class="kpi-sub">COH Main channel 2025</div>
+      <div class="kpi-icon">📺</div>
+      <div class="kpi-label" id="dkpi-imp-label">YT Impressions (2026 T1–T2)</div>
+      <div class="kpi-value" id="dkpi-imp-val">263,000</div>
+      <div class="kpi-sub" id="dkpi-imp-sub">T1: 136,300 · T2: 126,700</div>
     </div>
   </div>
 
   <div class="chart-grid-2">
     <div class="card">
-      <div class="card-title">Facebook — Quarterly Growth (2025)</div>
-      <div class="card-sub">Views, followers, and reactions by quarter</div>
+      <div class="card-title" id="titleFB">Facebook — Trimester Growth (2026)</div>
+      <div class="card-sub" id="subFB">Views, followers, and reactions by trimester</div>
       <canvas id="chartFB"></canvas>
     </div>
     <div class="card">
-      <div class="card-title">YouTube — Quarterly Growth (2025)</div>
-      <div class="card-sub">Views, subscribers, and video impressions</div>
+      <div class="card-title" id="titleYT">YouTube — Trimester Growth (2026)</div>
+      <div class="card-sub" id="subYT">Views and subscribers by trimester</div>
       <canvas id="chartYT"></canvas>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">Monday Connect Sign-ups (2025)</div>
-    <div class="card-sub">Quarterly digital engagement through Monday Connect platform</div>
-    <canvas id="chartMonConnect" style="max-height:200px"></canvas>
+  <div class="chart-grid-2">
+    <div class="card">
+      <div class="card-title" id="titleIG">Instagram — COH Main (2026)</div>
+      <div class="card-sub" id="subIG">Views and interactions by trimester</div>
+      <canvas id="chartIG"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Monday Connect Sign-ups (2025)</div>
+      <div class="card-sub">Quarterly digital engagement through Monday Connect platform</div>
+      <canvas id="chartMonConnect" style="max-height:200px"></canvas>
+    </div>
   </div>
 
   <!-- Ministry Highlights from Annual Report -->
@@ -534,47 +572,10 @@
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">Digital & Outreach — All Metrics (2025 Annual)</div>
-    <div class="card-sub">Full social media and digital metrics breakdown by quarter</div>
-    <div class="social-grid">
-      <div class="social-card">
-        <div class="social-platform">📘 Facebook (Quarterly 2025)</div>
-        <div class="social-metric"><span class="social-metric-name">Views</span><span style="font-size:10px;color:#94a3b8">T1: 65,667 → T2: 90,238 → T3: 67,963</span></div>
-        <div class="social-metric"><span class="social-metric-name">New Followers</span><span style="font-size:10px;color:#94a3b8">T1: 31 → T2: 60 → T3: 74</span></div>
-        <div class="social-metric"><span class="social-metric-name">Reactions</span><span style="font-size:10px;color:#94a3b8">T1: 653 → T2: 1,171 → T3: 2,192</span></div>
-      </div>
-      <div class="social-card">
-        <div class="social-platform">▶️ YouTube — COH Main (2025 Annual)</div>
-        <div class="social-metric"><span class="social-metric-name">Total Views</span><span class="social-metric-value">33,500</span></div>
-        <div class="social-metric"><span class="social-metric-name">Hours Watched</span><span class="social-metric-value">10,200</span></div>
-        <div class="social-metric"><span class="social-metric-name">New Subscribers</span><span class="social-metric-value">1,187</span></div>
-        <div class="social-metric" style="margin-top:8px; padding-top:8px; border-top:1px solid #e2e8f0;">
-          <span class="social-metric-name" style="font-style:italic; color:#64748b;">Quarterly trend</span>
-          <span style="font-size:10px;color:#94a3b8">T1: 7,300 → T2: 7,900 → T3: 8,900</span>
-        </div>
-      </div>
-      <div class="social-card">
-        <div class="social-platform">🟥 YouTube — Celebrate Recovery (2025)</div>
-        <div class="social-metric"><span class="social-metric-name">Total Views</span><span class="social-metric-value">53,764</span></div>
-        <div class="social-metric"><span class="social-metric-name">New Subscribers</span><span class="social-metric-value">412</span></div>
-      </div>
-      <div class="social-card">
-        <div class="social-platform">📷 Instagram — COH Main (2025 Annual)</div>
-        <div class="social-metric"><span class="social-metric-name">Followers</span><span class="social-metric-value">2,650</span></div>
-        <div class="social-metric"><span class="social-metric-name">YoY Follower Growth</span><span class="social-metric-value">+10%</span></div>
-        <div class="social-metric" style="margin-top:8px; padding-top:8px; border-top:1px solid #e2e8f0;">
-          <span class="social-metric-name" style="font-style:italic; color:#64748b;">T3 snapshot</span>
-        </div>
-        <div class="social-metric"><span class="social-metric-name">T3 Views</span><span class="social-metric-value">105,855</span></div>
-        <div class="social-metric"><span class="social-metric-name">T3 Interactions</span><span class="social-metric-value">2,842</span></div>
-      </div>
-      <div class="social-card">
-        <div class="social-platform">📱 COH Mobile App (2025)</div>
-        <div class="social-metric"><span class="social-metric-name">New Downloads</span><span class="social-metric-value">419</span></div>
-        <div class="social-metric"><span class="social-metric-name">Church Online Hours</span><span class="social-metric-value">445.3</span></div>
-      </div>
-    </div>
+  <div class="card" id="cardDigitalAll">
+    <div class="card-title" id="titleDigitalAll">Digital &amp; Outreach — All Metrics (2026 YTD)</div>
+    <div class="card-sub" id="subDigitalAll">Social media metrics by trimester (T1: Jan–Apr · T2: May–Aug · T3: Sep–Dec)</div>
+    <div class="social-grid" id="socialGrid"></div>
   </div>
 </div>
 
@@ -603,7 +604,7 @@ let YTH_26 = [{"date":"Jan 18","value":181},{"date":"Jan 25","value":145},{"date
 // ─── 2025 ESPAÑOL DATA ────────────────────────────────────────────────────
 let ESP_25 = [{"date":"Jan 5","fullDate":"2025-01-05","value":88},{"date":"Jan 12","fullDate":"2025-01-12","value":86},{"date":"Jan 19","fullDate":"2025-01-19","value":114},{"date":"Jan 26","fullDate":"2025-01-26","value":82},{"date":"Feb 2","fullDate":"2025-02-02","value":81},{"date":"Feb 9","fullDate":"2025-02-09","value":78},{"date":"Feb 16","fullDate":"2025-02-16","value":72},{"date":"Feb 23","fullDate":"2025-02-23","value":67},{"date":"Mar 2","fullDate":"2025-03-02","value":81},{"date":"Mar 9","fullDate":"2025-03-09","value":72},{"date":"Mar 16","fullDate":"2025-03-16","value":86},{"date":"Mar 23","fullDate":"2025-03-23","value":77},{"date":"Mar 30","fullDate":"2025-03-30","value":76},{"date":"Apr 6","fullDate":"2025-04-06","value":79},{"date":"Apr 13","fullDate":"2025-04-13","value":86},{"date":"Apr 20","fullDate":"2025-04-20","value":149},{"date":"Apr 27","fullDate":"2025-04-27","value":74},{"date":"May 4","fullDate":"2025-05-04","value":85},{"date":"May 11","fullDate":"2025-05-11","value":67},{"date":"May 18","fullDate":"2025-05-18","value":68},{"date":"Jun 1","fullDate":"2025-06-01","value":99},{"date":"Jun 8","fullDate":"2025-06-08","value":94},{"date":"Jun 15","fullDate":"2025-06-15","value":74},{"date":"Jun 22","fullDate":"2025-06-22","value":82},{"date":"Jun 29","fullDate":"2025-06-29","value":81},{"date":"Jul 6","fullDate":"2025-07-06","value":78},{"date":"Jul 13","fullDate":"2025-07-13","value":68},{"date":"Jul 20","fullDate":"2025-07-20","value":68},{"date":"Jul 27","fullDate":"2025-07-27","value":72},{"date":"Aug 3","fullDate":"2025-08-03","value":79},{"date":"Aug 10","fullDate":"2025-08-10","value":97},{"date":"Aug 17","fullDate":"2025-08-17","value":75},{"date":"Aug 24","fullDate":"2025-08-24","value":106},{"date":"Aug 31","fullDate":"2025-08-31","value":73},{"date":"Sep 7","fullDate":"2025-09-07","value":80},{"date":"Sep 14","fullDate":"2025-09-14","value":91},{"date":"Sep 21","fullDate":"2025-09-21","value":103},{"date":"Sep 28","fullDate":"2025-09-28","value":108},{"date":"Oct 5","fullDate":"2025-10-05","value":94},{"date":"Oct 12","fullDate":"2025-10-12","value":81},{"date":"Oct 19","fullDate":"2025-10-19","value":88},{"date":"Oct 26","fullDate":"2025-10-26","value":64},{"date":"Nov 2","fullDate":"2025-11-02","value":93},{"date":"Nov 9","fullDate":"2025-11-09","value":84},{"date":"Nov 16","fullDate":"2025-11-16","value":68},{"date":"Nov 23","fullDate":"2025-11-23","value":76},{"date":"Nov 30","fullDate":"2025-11-30","value":99},{"date":"Dec 7","fullDate":"2025-12-07","value":93},{"date":"Dec 14","fullDate":"2025-12-14","value":124},{"date":"Dec 21","fullDate":"2025-12-21","value":110}];
 
-const OFF_BREAKDOWN = {"General / Flourish":2869508,"Español":158559,"Love the 561":100864,"Missions":36866,"Celebrate Recovery":34810,"YTH Camp":16414,"COH Kids":1426};
+const OFF_BREAKDOWN = {"General / Flourish":2869508,"Español":158559,"Missions":36866};
 
 const MAPS_TABLE = [
   // ── DISINTERESTED ─────────────────────────────────────────────────────────
@@ -670,7 +671,7 @@ const MAPS_TABLE_26 = [
 ];
 
 // ═══════════════════════════ STATE ══════════════════════════════════════════
-let currentYear = 2025;
+let currentYear = 2026;
 let charts = {};
 
 // ═══════════════════════════ UTILS ══════════════════════════════════════════
@@ -712,17 +713,91 @@ function mkChart(id, type, labels, datasets, opts={}) {
 const GIVING_ADJ_25 = 959013.07;
 
 // ─── LIVE DATA CONFIG ────────────────────────────────────────────────────────
-const SHEET_ID    = '1m6pdQuS3EXF6alnooLOovzXZG5Nfea-bCtiOWkSNT7Y';
+const SHEET_ID      = '1m6pdQuS3EXF6alnooLOovzXZG5Nfea-bCtiOWkSNT7Y';
+const COMMS_SHEET_ID= '1tmDa2Fyn7PdFagkzK6DabeqiswJXILE4H8eIj2KOzsg';
 let   CC_26_YTD   = 52;   // Connect Cards 2026 YTD — overwritten on live load
 let   DATA_LIVE   = false; // true once sheet fetch succeeds
+
+// Live comms data — initialised with last-known values, overwritten on fetch
+let COMMS_26 = {
+  igViews:        [147162, 146854, null],
+  igFollowers:    [169, 211, null],
+  igInteractions: [5700, 7600, null],
+  fbViews:        [101883, 80302, null],
+  fbFollowers:    [89, 55, null],
+  fbReactions:    [2407, 2464, null],
+  ytViews:        [13000, 12000, null],
+  ytSubs:         [169, 108, null],
+  ytImpressions:  [136300, 126700, null],
+};
+
+// Food distributions 2026 from TOTALS tab — overwritten on live load
+let FOOD_DIST_26 = { T1: 7442, T2: 6609, T3: null };
+
+// Map TOTALS sheet canonical names (col G, lowercase) → MAPS_TABLE_26 metric
+const TOTALS_TO_MAPS = {
+  'support groups':                       'Support Groups (participants)',
+  'social media engagement':              'Social Media Engagement',
+  'community-wide events and gatherings': 'Community-Wide Events & Gatherings',
+  'food distributions (individuals)':     'Food Distributions (individuals)',
+  'avg. weekly attendance':               'Avg Weekly Attendance (all campuses)',
+  'open house attendance':                'Open House Attendance',
+  'next steps forms':                     'Next Steps Forms',
+  'digital connect cards':                'Digital Connect Cards',
+  'alpha attendance':                     'Alpha Attendance',
+  'monday connect sign-ups':              'Monday Connect Sign-ups',
+  'new follows on social':                'New Follows on Social',
+  'app downloads':                        'App Downloads (New COH App)',
+  'new partners':                         'New Partners',
+  'baptisms':                             'Baptisms',
+  'new giving units':                     'New Giving Units',
+  'total volunteers':                     'New Volunteers',
+  'groups and course attendance':         'Groups & Course Attendance',
+  'discipleship bands':                   'Discipleship Bands',
+  'coh yth leadership':                   'COH YTH Leadership',
+  'cr sponsor relationships':             'CR Sponsor Relationships',
+  'cr step studies':                      'CR Step Studies',
+};
+
+function parseTotalsSheet(rows) {
+  const parseNum = s => { const v = parseFloat((s||'').replace(/,/g,'')); return (isNaN(v)||v<0) ? null : v; };
+  rows.forEach(row => {
+    if (row.length < 4) return;
+    const canonKey  = (row[6]||'').trim().toLowerCase();
+    const mapsName  = TOTALS_TO_MAPS[canonKey];
+    const t1 = parseNum(row[1]);
+    const t2 = parseNum(row[2]);
+    const t3 = parseNum(row[3]);
+    if (mapsName) {
+      const entry = MAPS_TABLE_26.find(r => r.metric === mapsName);
+      if (entry) {
+        if (t1 != null) entry.T1 = t1;
+        if (t2 != null) entry.T2 = t2;
+        if (t3 != null) entry.T3 = t3;
+        const filled = [t1,t2,t3].filter(v=>v!=null);
+        if (filled.length) entry.annual = filled.reduce((a,b)=>a+b,0);
+      }
+    }
+    if (canonKey === 'food distributions (individuals)') {
+      FOOD_DIST_26 = { T1: t1, T2: t2, T3: t3 };
+    }
+  });
+}
 const MONTHS_3    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 // ── CSV fetch helpers ────────────────────────────────────────────────────────
-async function fetchSheetCSV(sheetName) {
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+async function fetchSheetCSV(sheetName, sheetId = SHEET_ID) {
+  const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
   const resp = await fetch(url);
   if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching "${sheetName}"`);
   return resp.text();
+}
+
+// Parse a named metric from comms CSV rows → [T1, T2, T3] (null = no data)
+function parseCommsMetric(rows, keyword) {
+  const row = rows.find(r => r[0] && r[0].toLowerCase().includes(keyword.toLowerCase()));
+  if (!row) return [null, null, null];
+  return [1,2,3].map(i => { const v = parseFloat((row[i]||'').replace(/,/g,'')); return isNaN(v)||v<=0 ? null : v; });
 }
 
 function parseCSV(text) {
@@ -777,13 +852,35 @@ async function loadLiveData() {
   const badge = document.getElementById('data-badge');
   if (badge) { badge.textContent = '⏳ Syncing…'; badge.style.color = '#94a3b8'; }
 
+  // TOTALS (MAPS data) + Comms — fetched separately, won't block badge
+  fetchSheetCSV('TOTALS', COMMS_SHEET_ID).then(csvTotals => {
+    parseTotalsSheet(parseCSV(csvTotals));
+    if (document.getElementById('page-maps')?.classList.contains('active')) renderMAPSCharts();
+    renderKPIs();
+  }).catch(err => console.warn('TOTALS sheet fetch failed:', err));
+
+  fetchSheetCSV('Comms', COMMS_SHEET_ID).then(csvComms => {
+    const rowsComms = parseCSV(csvComms);
+    const cm = (k, kw) => { const v = parseCommsMetric(rowsComms, kw); if (v.some(x=>x!==null)) COMMS_26[k] = v; };
+    cm('igViews',        'IG Views - COH Main');
+    cm('igFollowers',    'IG Followers - COH Main');
+    cm('igInteractions', 'IG Interactions - COH Main');
+    cm('fbViews',        'FB Views - COH Main');
+    cm('fbFollowers',    'FB Followers - COH Main');
+    cm('fbReactions',    'FB Reactions - COH Main');
+    cm('ytViews',        'YT Views - All Content');
+    cm('ytSubs',         'YT Subscribers - COH Main');
+    cm('ytImpressions',  'YT Video Impressions');
+    if (document.getElementById('page-digital')?.classList.contains('active')) renderDigitalCharts();
+  }).catch(err => console.warn('Comms sheet fetch failed (using cached data):', err));
+
   try {
     const [csv25, csv26] = await Promise.all([
       fetchSheetCSV('2025 All Campuses Combined'),
-      fetchSheetCSV('2026 All Campuses Combined')
+      fetchSheetCSV('2026 All Campuses Combined'),
     ]);
-    const rows25 = parseCSV(csv25);
-    const rows26 = parseCSV(csv26);
+    const rows25  = parseCSV(csv25);
+    const rows26  = parseCSV(csv26);
 
     // Helper: only overwrite if we got real data back
     const update = (target, val) => { if (val && val.length) eval(`${target} = val`); };
@@ -822,10 +919,12 @@ async function loadLiveData() {
     renderOverviewCharts();
     if (document.getElementById('page-attendance')?.classList.contains('active')) renderAttendanceCharts();
     if (document.getElementById('page-giving')?.classList.contains('active'))     renderGivingCharts();
+    if (document.getElementById('page-digital')?.classList.contains('active'))    renderDigitalCharts();
 
   } catch (err) {
     console.error('Live data fetch failed:', err);
-    if (badge) { badge.textContent = '🟡 Cached data'; badge.style.color = '#d97706'; }
+    const errMsg = err?.message || String(err);
+    if (badge) { badge.textContent = '🟡 Cached · ' + errMsg.substring(0,40); badge.style.color = '#d97706'; }
   }
 }
 
@@ -858,43 +957,78 @@ function renderKPIs() {
     <div class="kpi-card purple"><div class="kpi-icon">📋</div>
       <div class="kpi-label">Connect Cards (${currentYear} YTD)</div>
       <div class="kpi-value">${currentYear === 2025 ? '210' : Math.round(CC_26_YTD)}</div>
-      <div class="kpi-sub">${currentYear === 2025 ? 'Digital cards T1–T3' : 'Digital cards YTD (8 wks)'}</div>
+      <div class="kpi-sub">${currentYear === 2025 ? 'Digital cards T1–T3' : 'Digital cards YTD — ' + weeks + ' wks'}</div>
     </div>
     <div class="kpi-card rose"><div class="kpi-icon">🍎</div>
       <div class="kpi-label">Food Distributions (${currentYear === 2025 ? '2025 Annual' : '2026 YTD'})</div>
-      <div class="kpi-value">${currentYear === 2025 ? '14,821' : '—'}</div>
-      <div class="kpi-sub">${currentYear === 2025 ? 'Individuals served (annual)' : 'Data in progress'}</div>
+      <div class="kpi-value">${currentYear === 2025 ? '14,821' : ((FOOD_DIST_26.T1||0)+(FOOD_DIST_26.T2||0)+(FOOD_DIST_26.T3||0)).toLocaleString()}</div>
+      <div class="kpi-sub">${currentYear === 2025 ? 'Individuals served (annual)' : 'T1: '+(FOOD_DIST_26.T1||0).toLocaleString()+' · T2: '+(FOOD_DIST_26.T2||0).toLocaleString()+(FOOD_DIST_26.T3?' · T3: '+FOOD_DIST_26.T3.toLocaleString():'')}</div>
     </div>`;
 
-  // Attendance page KPIs — using 2025 Annual Report official averages
+  // Attendance page KPIs — year-aware
   const kpiAtt = document.getElementById('kpi-att');
   if (kpiAtt) {
-    kpiAtt.innerHTML = `
-      <div class="kpi-card blue"><div class="kpi-icon">🏛️</div>
-        <div class="kpi-label">Loxahatchee Avg Weekly</div>
-        <div class="kpi-value">1,624</div>
-        <div class="kpi-sub">2025 Annual Report</div>
-      </div>
-      <div class="kpi-card teal"><div class="kpi-icon">🏢</div>
-        <div class="kpi-label">Lake Worth Avg Weekly</div>
-        <div class="kpi-value">305</div>
-        <div class="kpi-sub">2025 Annual Report</div>
-      </div>
-      <div class="kpi-card amber"><div class="kpi-icon">🌐</div>
-        <div class="kpi-label">COH Español Avg Weekly</div>
-        <div class="kpi-value">83</div>
-        <div class="kpi-sub">2025 Annual Report</div>
-      </div>
-      <div class="kpi-card purple"><div class="kpi-icon">💻</div>
-        <div class="kpi-label">Online Avg Weekly</div>
-        <div class="kpi-value">260</div>
-        <div class="kpi-sub">2025 Annual Report</div>
-      </div>
-      <div class="kpi-card green"><div class="kpi-icon">✝️</div>
-        <div class="kpi-label">All Campuses Combined</div>
-        <div class="kpi-value">2,262</div>
-        <div class="kpi-sub">2025 Annual Report</div>
-      </div>`;
+    if (currentYear === 2026) {
+      const loxAvg26 = avg(vals(LOX_26));
+      const lwAvg26  = avg(vals(LW_26));
+      const espAvg26 = avg(vals(ESP_26));
+      const ythAvg26 = avg(vals(YTH_26));
+      const attAvg26 = avg(vals(ATT_26));
+      const wks26att = ATT_26.length;
+      kpiAtt.innerHTML = `
+        <div class="kpi-card blue"><div class="kpi-icon">🏛️</div>
+          <div class="kpi-label">Loxahatchee Avg Weekly</div>
+          <div class="kpi-value">${fmt(loxAvg26)}</div>
+          <div class="kpi-sub">2026 YTD — ${LOX_26.length} weeks</div>
+        </div>
+        <div class="kpi-card teal"><div class="kpi-icon">🏢</div>
+          <div class="kpi-label">Lake Worth Avg Weekly</div>
+          <div class="kpi-value">${fmt(lwAvg26)}</div>
+          <div class="kpi-sub">2026 YTD — ${LW_26.length} weeks</div>
+        </div>
+        <div class="kpi-card amber"><div class="kpi-icon">🌐</div>
+          <div class="kpi-label">COH Español Avg Weekly</div>
+          <div class="kpi-value">${fmt(espAvg26)}</div>
+          <div class="kpi-sub">2026 YTD — ${ESP_26.length} weeks</div>
+        </div>
+        <div class="kpi-card purple"><div class="kpi-icon">🙌</div>
+          <div class="kpi-label">COH Youth Avg Weekly</div>
+          <div class="kpi-value">${fmt(ythAvg26)}</div>
+          <div class="kpi-sub">2026 YTD — ${YTH_26.length} weeks</div>
+        </div>
+        <div class="kpi-card green"><div class="kpi-icon">✝️</div>
+          <div class="kpi-label">All Campuses Combined</div>
+          <div class="kpi-value">${fmt(attAvg26)}</div>
+          <div class="kpi-sub">2026 YTD avg — ${wks26att} weeks</div>
+        </div>`;
+    } else {
+      kpiAtt.innerHTML = `
+        <div class="kpi-card blue"><div class="kpi-icon">🏛️</div>
+          <div class="kpi-label">Loxahatchee Avg Weekly</div>
+          <div class="kpi-value">1,624</div>
+          <div class="kpi-sub">2025 Annual Report</div>
+        </div>
+        <div class="kpi-card teal"><div class="kpi-icon">🏢</div>
+          <div class="kpi-label">Lake Worth Avg Weekly</div>
+          <div class="kpi-value">305</div>
+          <div class="kpi-sub">2025 Annual Report</div>
+        </div>
+        <div class="kpi-card amber"><div class="kpi-icon">🌐</div>
+          <div class="kpi-label">COH Español Avg Weekly</div>
+          <div class="kpi-value">83</div>
+          <div class="kpi-sub">2025 Annual Report</div>
+        </div>
+        <div class="kpi-card purple"><div class="kpi-icon">💻</div>
+          <div class="kpi-label">Online Avg Weekly</div>
+          <div class="kpi-value">260</div>
+          <div class="kpi-sub">2025 Annual Report</div>
+        </div>
+        <div class="kpi-card green"><div class="kpi-icon">✝️</div>
+          <div class="kpi-label">All Campuses Combined</div>
+          <div class="kpi-value">2,262</div>
+          <div class="kpi-sub">2025 Annual Report</div>
+        </div>`;
+    }
   }
 
   // Giving page KPIs — year-aware
@@ -916,16 +1050,6 @@ function renderKPIs() {
           <div class="kpi-label">Avg Weekly Giving 2025</div>
           <div class="kpi-value">${fmtCur(avgWeeklyGiving25)}</div>
           <div class="kpi-sub">Over ${OFF_25.length} recorded weeks</div>
-        </div>
-        <div class="kpi-card amber"><div class="kpi-icon">✝️</div>
-          <div class="kpi-label">Missions Giving 2025</div>
-          <div class="kpi-value">$36,866</div>
-          <div class="kpi-sub">Full year total</div>
-        </div>
-        <div class="kpi-card purple"><div class="kpi-icon">❤️</div>
-          <div class="kpi-label">Love the 561 (2025)</div>
-          <div class="kpi-value">$100,864</div>
-          <div class="kpi-sub">Community benevolence fund</div>
         </div>
         <div class="kpi-card green"><div class="kpi-icon">📈</div>
           <div class="kpi-label">2026 T1 Giving (YTD)</div>
@@ -954,11 +1078,7 @@ function renderKPIs() {
           <div class="kpi-value">—</div>
           <div class="kpi-sub">Data in progress</div>
         </div>
-        <div class="kpi-card green"><div class="kpi-icon">❤️</div>
-          <div class="kpi-label">Love the 561 (2026)</div>
-          <div class="kpi-value">—</div>
-          <div class="kpi-sub">Data in progress</div>
-        </div>`;
+        `;
     }
   }
 }
@@ -991,60 +1111,58 @@ function renderOverviewCharts() {
 
 function renderAttendanceCharts() {
   const is26 = currentYear === 2026;
+  const yr = currentYear;
 
-  // ── Campus weekly line chart (year-aware + ministry lines) ──────────────
-  const loxData  = is26 ? LOX_26  : LOX_25;
-  const lwData   = is26 ? LW_26   : LW_25;
-  const espData  = is26 ? ESP_26  : ESP_25;
-  const crData   = is26 ? CR_26   : CR_25;
-  const ythData  = is26 ? YTH_26  : YTH_25;
-
-  const allLbls = loxData.map(r=>r.date);
-  const lwMap   = Object.fromEntries(lwData.map(r=>[r.date, r.value]));
-  const espMap  = Object.fromEntries(espData.map(r=>[r.date, r.value]));
-  const crMap   = Object.fromEntries(crData.map(r=>[r.date, r.value]));
-  const ythMap  = Object.fromEntries(ythData.map(r=>[r.date, r.value]));
-
-  mkChart('chartCampusWeekly','line', allLbls, [
-    {label:'Loxahatchee',   data:vals(loxData), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.05)', tension:0.35, pointRadius:2, fill:true},
-    {label:'Lake Worth',    data:allLbls.map(d=>lwMap[d]||null),  borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.05)', tension:0.35, pointRadius:2, fill:false, spanGaps:true},
-    {label:'COH Español',   data:allLbls.map(d=>espMap[d]||null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.05)', tension:0.35, pointRadius:3, fill:false, spanGaps:true, borderDash:[]},
-    {label:'COH Youth',     data:allLbls.map(d=>ythMap[d]||null), borderColor:'#7c3aed', backgroundColor:'rgba(124,58,237,0.05)', tension:0.35, pointRadius:3, fill:false, spanGaps:true, borderDash:[4,4]},
-    {label:'Celebrate Recovery', data:allLbls.map(d=>crMap[d]||null), borderColor:'#e11d48', backgroundColor:'rgba(225,29,72,0.05)', tension:0.35, pointRadius:3, fill:false, spanGaps:true, borderDash:[6,3]},
-  ], {maxTicks:26, extra:{plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,font:{size:11}}}}}});
-
-  // ── Service time avg bars (2025 only) ──────────────────────────────────
-  if (!is26) {
-    mkChart('chartServiceTimes','bar',['8:30 AM','10:00 AM','11:30 AM'],[{
-      label:'Avg Attendance',
-      data:[avg(vals(LOX_8)), avg(vals(LOX_10)), avg(vals(LOX_11))],
-      backgroundColor:['#2563eb','#10b981','#f59e0b'], borderRadius:8, barThickness:48
-    }],{legend:false});
-  } else {
-    mkChart('chartServiceTimes','bar',['8:30 AM','10:00 AM','11:30 AM'],[{
-      label:'Avg Attendance (2026 YTD)',
-      data:[null, null, null],
-      backgroundColor:['#2563eb','#10b981','#f59e0b'], borderRadius:8, barThickness:48
-    }],{legend:false});
+  // Helper: build a YoY line chart for a single campus
+  // Uses 2025 date labels as X-axis; 2026 data plotted at matching positions
+  function mkYoY(id, d25, d26, color) {
+    const labels = d25.map(r=>r.date);
+    const map26  = Object.fromEntries(d26.map(r=>[r.date, r.value]));
+    mkChart(id,'line', labels, [
+      {label:'2025', data:vals(d25), borderColor:color, backgroundColor:color.replace('1)','0.08)'), tension:0.35, pointRadius:2, fill:true},
+      {label:'2026 YTD', data:labels.map(d=>map26[d]??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.08)', tension:0.35, pointRadius:3, fill:false, borderDash:[6,3], spanGaps:false},
+    ], {maxTicks:18, extra:{plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:10}}}}}});
   }
 
+  // ── Combined overview (all campuses, 2025 vs 2026) ─────────────────────
+  const attLabels = ATT_25.map(r=>r.date);
+  const att26Map  = Object.fromEntries(ATT_26.map(r=>[r.date, r.value]));
+  mkChart('chartCampusWeekly','line', attLabels, [
+    {label:'2025 Total', data:vals(ATT_25), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.07)', tension:0.35, pointRadius:2, fill:true},
+    {label:'2026 YTD',  data:attLabels.map(d=>att26Map[d]??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.07)', tension:0.35, pointRadius:3, fill:false, borderDash:[6,3], spanGaps:false},
+  ], {maxTicks:26, extra:{plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11}}}}}});
+
+  // ── Per-campus YoY charts ──────────────────────────────────────────────
+  mkYoY('chartLox', LOX_25, LOX_26, 'rgba(37,99,235,1)');
+  mkYoY('chartLW',  LW_25,  LW_26,  'rgba(16,185,129,1)');
+  mkYoY('chartEsp', ESP_25, ESP_26, 'rgba(245,158,11,1)');
+  mkYoY('chartYth', YTH_25, YTH_26, 'rgba(124,58,237,1)');
+  mkYoY('chartCR',  CR_25,  CR_26,  'rgba(225,29,72,1)');
+
   // ── Ministry avg bars ──────────────────────────────────────────────────
-  const minLabels = ['Celebrate Recovery','COH Youth','COH Kids','Español','Online'];
-  const minData26 = [
-    Math.round(avg(vals(CR_26))),
-    Math.round(avg(vals(YTH_26))),
-    null,
-    Math.round(avg(vals(ESP_26))),
-    null
-  ];
-  const minData25 = [90, 142, 179, 83, 260];
+  const minLabels = ['Celebrate Recovery','COH Youth','Español','Online'];
+  const minData26 = [Math.round(avg(vals(CR_26))), Math.round(avg(vals(YTH_26))), Math.round(avg(vals(ESP_26))), null];
+  const minData25 = [90, 142, 83, 260];
   mkChart('chartMinistry','bar', minLabels,[{
-    label:'Avg Weekly Attendance',
+    label:`Avg Weekly — ${yr}`,
     data: is26 ? minData26 : minData25,
-    backgroundColor:COLORS, borderRadius:6
+    backgroundColor:['#e11d48','#7c3aed','#f59e0b','#2563eb'], borderRadius:6
   }],{legend:false});
 
-  // ── Service time lines (2025 only) ─────────────────────────────────────
+  // ── Loxahatchee service time avg bars ─────────────────────────────────
+  mkChart('chartServiceTimes','bar',['8:30 AM','10:00 AM','11:30 AM'],[{
+    label: is26 ? 'Avg Attendance (2026 YTD)' : 'Avg Attendance (2025)',
+    data: is26 ? [null,null,null] : [avg(vals(LOX_8)), avg(vals(LOX_10)), avg(vals(LOX_11))],
+    backgroundColor:['#2563eb','#10b981','#f59e0b'], borderRadius:8, barThickness:48
+  }],{legend:false});
+
+  // ── Lake Worth service time placeholder ───────────────────────────────
+  mkChart('chartLWTimes','bar',['10:00 AM','11:30 AM'],[{
+    label:'Data coming soon', data:[null,null],
+    backgroundColor:['#10b981','#059669'], borderRadius:8, barThickness:48
+  }],{legend:false});
+
+  // ── Loxahatchee weekly service time lines (2025 only) ─────────────────
   if (!is26) {
     const lineLabels = LOX_8.map(r=>r.date);
     const l10Map = Object.fromEntries(LOX_10.map(r=>[r.date,r.value]));
@@ -1054,55 +1172,24 @@ function renderAttendanceCharts() {
       {label:'10:00 AM', data:lineLabels.map(d=>l10Map[d]||null), borderColor:'#10b981', tension:0.35, pointRadius:1, fill:false, spanGaps:true},
       {label:'11:30 AM', data:lineLabels.map(d=>l11Map[d]||null), borderColor:'#f59e0b', tension:0.35, pointRadius:1, fill:false, spanGaps:true},
     ], {maxTicks:20});
+  } else {
+    if (charts['chartServiceLine']) { charts['chartServiceLine'].destroy(); delete charts['chartServiceLine']; }
   }
 }
 
 function renderGivingCharts() {
   const is26 = currentYear === 2026;
 
-  // Update card titles to reflect selected year
-  const card25  = document.querySelector('#chartGiving25')?.closest('.card');
-  const card26  = document.querySelector('#chartGiving26')?.closest('.card');
-  const cardFunds = document.querySelector('#chartGivingFunds')?.closest('.card');
-  const cardBar   = document.querySelector('#chartGivingBar')?.closest('.card');
+  // ── Combined YoY weekly giving chart ──────────────────────────────────
+  // Use 2025 date labels as X-axis; 2026 plotted at matching positions
+  const gLabels = OFF_25.map(r=>r.date);
+  const gMap26  = Object.fromEntries(OFF_26.map(r=>[r.date, r.value]));
+  mkChart('chartGivingYoY','line', gLabels, [
+    {label:'2025', data:vals(OFF_25), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.07)', tension:0.35, pointRadius:2, fill:true},
+    {label:'2026 YTD', data:gLabels.map(d=>gMap26[d]??null), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.07)', tension:0.35, pointRadius:4, fill:false, borderDash:[6,3], spanGaps:false},
+  ], {currency:true, maxTicks:18, extra:{plugins:{legend:{display:true,position:'top',labels:{boxWidth:10,font:{size:11}}}}}});
 
-  if (card25) {
-    card25.querySelector('.card-title').textContent = is26
-      ? 'Weekly Giving — 2025 Full Year (Reference)'
-      : 'Weekly Giving — 2025 Full Year';
-    card25.querySelector('.card-sub').textContent = 'Total offerings by week (all campuses combined)';
-  }
-  if (card26) {
-    card26.querySelector('.card-title').textContent = 'Weekly Giving — 2026 Trimester 1 (YTD)';
-    card26.querySelector('.card-sub').textContent = is26
-      ? 'T1: January – May 2026 (Jan–Feb data shown)'
-      : 'T1: January – May 2026 (Jan–Feb data shown)';
-  }
-  if (cardFunds) {
-    cardFunds.querySelector('.card-title').textContent = is26
-      ? 'Giving by Fund — 2025 Annual Total (Reference)'
-      : 'Giving by Fund — 2025 Annual Total';
-    cardFunds.querySelector('.card-sub').textContent = is26
-      ? '2026 fund breakdown in progress; 2025 shown for reference'
-      : 'How total giving was distributed across funds';
-  }
-  if (cardBar) {
-    cardBar.querySelector('.card-title').textContent = is26
-      ? 'Giving by Fund — Dollar Amounts (2025 Reference)'
-      : 'Giving by Fund — Dollar Amounts';
-    cardBar.querySelector('.card-sub').textContent = is26
-      ? 'Bar chart of 2025 totals (2026 fund data pending)'
-      : 'Bar chart of total per category (2025)';
-  }
-
-  mkChart('chartGiving25','line', OFF_25.map(r=>r.date), [
-    {label:'Weekly Giving', data:vals(OFF_25), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.07)', tension:0.35, pointRadius:2, fill:true}
-  ], {currency:true, legend:false, maxTicks:18});
-
-  mkChart('chartGiving26','line', OFF_26.map(r=>r.date), [
-    {label:'Weekly Giving', data:vals(OFF_26), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.07)', tension:0.35, pointRadius:4, fill:true}
-  ], {currency:true, legend:false});
-
+  // ── Fund breakdown charts ──────────────────────────────────────────────
   const offLabels = Object.keys(OFF_BREAKDOWN);
   const offVals   = Object.values(OFF_BREAKDOWN);
   mkChart('chartGivingFunds','doughnut', offLabels, [{
@@ -1173,24 +1260,195 @@ function renderMAPSCharts() {
 }
 
 function renderDigitalCharts() {
-  mkChart('chartFB','bar',['T1 (Jan–Apr)','T2 (May–Aug)','T3 (Sep–Dec)'],[
-    {label:'Views (÷100)', data:[657,902,680], backgroundColor:'rgba(37,99,235,0.7)', borderRadius:6, yAxisID:'y'},
-    {label:'New Followers', data:[31,60,74], backgroundColor:'rgba(16,185,129,0.7)', borderRadius:6, yAxisID:'y'},
-    {label:'Reactions', data:[653,1171,2192], backgroundColor:'rgba(245,158,11,0.5)', borderRadius:6, yAxisID:'y'},
-  ],{extra:{plugins:{tooltip:{callbacks:{label:(c)=>{
-    if(c.datasetIndex===0) return ` Views: ${(c.raw*100).toLocaleString()}`;
-    return ` ${c.dataset.label}: ${c.raw}`;
-  }}}}}});
+  const is26 = currentYear === 2026;
+  const yr = currentYear;
+  const labs = ['T1 (Jan–Apr)','T2 (May–Aug)','T3 (Sep–Dec)'];
+  const setEl = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
 
-  mkChart('chartYT','bar',['T1 (Jan–Apr)','T2 (May–Aug)','T3 (Sep–Dec)'],[
-    {label:'Views', data:[7300,7900,8900], backgroundColor:'rgba(220,38,38,0.6)', borderRadius:6},
-    {label:'Subscribers', data:[72,97,125], backgroundColor:'rgba(220,38,38,0.3)', borderRadius:6},
-  ],{});
+  // ── KPI cards ──────────────────────────────────────────────────────────────
+  if (is26) {
+    const fmt = v => v != null ? v.toLocaleString() : '—';
+    const c = COMMS_26;
+    const igFollYTD  = (c.igFollowers[0]||0) + (c.igFollowers[1]||0);
+    const ytViewsYTD = (c.ytViews[0]||0) + (c.ytViews[1]||0);
+    const fbViewsYTD = (c.fbViews[0]||0) + (c.fbViews[1]||0);
+    const igIntYTD   = (c.igInteractions[0]||0) + (c.igInteractions[1]||0);
+    const ytImpYTD   = (c.ytImpressions[0]||0) + (c.ytImpressions[1]||0);
+    setEl('dkpi-ig-label',  'IG New Followers (2026 T1–T2)');
+    setEl('dkpi-ig-val',    igFollYTD.toLocaleString());
+    setEl('dkpi-ig-sub',    `COH Main — T1: ${fmt(c.igFollowers[0])} · T2: ${fmt(c.igFollowers[1])}`);
+    setEl('dkpi-yt-label',  'YT Views (2026 T1–T2)');
+    setEl('dkpi-yt-val',    ytViewsYTD.toLocaleString());
+    setEl('dkpi-yt-sub',    `T1: ${fmt(c.ytViews[0])} · T2: ${fmt(c.ytViews[1])}`);
+    setEl('dkpi-fb-label',  'FB Views (2026 T1–T2)');
+    setEl('dkpi-fb-val',    fbViewsYTD.toLocaleString());
+    setEl('dkpi-fb-sub',    `T1: ${fmt(c.fbViews[0])} · T2: ${fmt(c.fbViews[1])}`);
+    setEl('dkpi-ig2-label', 'IG Interactions (2026 T1–T2)');
+    setEl('dkpi-ig2-val',   igIntYTD.toLocaleString());
+    setEl('dkpi-ig2-sub',   `T1: ${fmt(c.igInteractions[0])} · T2: ${fmt(c.igInteractions[1])}`);
+    setEl('dkpi-imp-label', 'YT Impressions (2026 T1–T2)');
+    setEl('dkpi-imp-val',   ytImpYTD.toLocaleString());
+    setEl('dkpi-imp-sub',   `T1: ${fmt(c.ytImpressions[0])} · T2: ${fmt(c.ytImpressions[1])}`);
+  } else {
+    setEl('dkpi-ig-label',  'IG Followers (2025 Annual)');
+    setEl('dkpi-ig-val',    '2,650');
+    setEl('dkpi-ig-sub',    'COH Main — +10% YoY');
+    setEl('dkpi-yt-label',  'YT Views (2025 Annual)');
+    setEl('dkpi-yt-val',    '33,500');
+    setEl('dkpi-yt-sub',    'COH Main YouTube');
+    setEl('dkpi-fb-label',  'FB Views (2025 Annual)');
+    setEl('dkpi-fb-val',    '223,868');
+    setEl('dkpi-fb-sub',    'T1: 65,667 · T2: 90,238 · T3: 67,963');
+    setEl('dkpi-ig2-label', 'CR YT Views (2025)');
+    setEl('dkpi-ig2-val',   '53,764');
+    setEl('dkpi-ig2-sub',   'Celebrate Recovery channel');
+    setEl('dkpi-imp-label', 'New App Downloads (2025)');
+    setEl('dkpi-imp-val',   '419');
+    setEl('dkpi-imp-sub',   'New COH Mobile App');
+  }
 
-  mkChart('chartMonConnect','bar',['T1 (Jan–Apr)','T2 (May–Aug)','T3 (Sep–Dec)'],[{
+  // ── Chart titles ────────────────────────────────────────────────────────────
+  setEl('titleFB', `Facebook — Trimester Growth (${yr})`);
+  setEl('titleYT', `YouTube — Trimester Growth (${yr})`);
+  setEl('titleIG', `Instagram — COH Main (${yr})`);
+  setEl('titleDigitalAll', `Digital & Outreach — All Metrics (${is26 ? '2026 YTD' : '2025 Annual'})`);
+
+  // ── Facebook chart ─────────────────────────────────────────────────────────
+  if (is26) {
+    const c = COMMS_26;
+    const fbV = c.fbViews.map(v=>v?Math.round(v/1000):null);
+    mkChart('chartFB','bar', labs,[
+      {label:'Views (÷1000)', data:fbV,            backgroundColor:'rgba(37,99,235,0.7)', borderRadius:6},
+      {label:'New Followers', data:c.fbFollowers,  backgroundColor:'rgba(16,185,129,0.7)', borderRadius:6},
+      {label:'Reactions',     data:c.fbReactions,  backgroundColor:'rgba(245,158,11,0.5)', borderRadius:6},
+    ],{extra:{plugins:{tooltip:{callbacks:{label:(c)=>{
+      if(c.datasetIndex===0) return ` Views: ${((c.raw||0)*1000).toLocaleString()}`;
+      return ` ${c.dataset.label}: ${(c.raw||0).toLocaleString()}`;
+    }}}}}});
+  } else {
+    mkChart('chartFB','bar', labs,[
+      {label:'Views (÷100)', data:[657,902,680], backgroundColor:'rgba(37,99,235,0.7)', borderRadius:6},
+      {label:'New Followers', data:[31,60,74],   backgroundColor:'rgba(16,185,129,0.7)', borderRadius:6},
+      {label:'Reactions',    data:[653,1171,2192], backgroundColor:'rgba(245,158,11,0.5)', borderRadius:6},
+    ],{extra:{plugins:{tooltip:{callbacks:{label:(c)=>{
+      if(c.datasetIndex===0) return ` Views: ${(c.raw*100).toLocaleString()}`;
+      return ` ${c.dataset.label}: ${c.raw}`;
+    }}}}}});
+  }
+
+  // ── YouTube chart ──────────────────────────────────────────────────────────
+  if (is26) {
+    const cy = COMMS_26;
+    mkChart('chartYT','bar', labs,[
+      {label:'Views',          data:cy.ytViews, backgroundColor:'rgba(220,38,38,0.6)', borderRadius:6},
+      {label:'New Subscribers',data:cy.ytSubs,  backgroundColor:'rgba(220,38,38,0.3)', borderRadius:6},
+    ],{});
+  } else {
+    mkChart('chartYT','bar', labs,[
+      {label:'Views', data:[7300,7900,8900], backgroundColor:'rgba(220,38,38,0.6)', borderRadius:6},
+      {label:'Subscribers', data:[72,97,125], backgroundColor:'rgba(220,38,38,0.3)', borderRadius:6},
+    ],{});
+  }
+
+  // ── Instagram chart (2026 only; 2025 data limited) ─────────────────────────
+  if (is26) {
+    const ci = COMMS_26;
+    const igV = ci.igViews.map(v=>v?Math.round(v/1000):null);
+    mkChart('chartIG','bar', labs,[
+      {label:'Views (÷1000)', data:igV,              backgroundColor:'rgba(168,85,247,0.7)', borderRadius:6},
+      {label:'Interactions',  data:ci.igInteractions, backgroundColor:'rgba(168,85,247,0.3)', borderRadius:6},
+    ],{extra:{plugins:{tooltip:{callbacks:{label:(c)=>{
+      if(c.datasetIndex===0) return ` Views: ${((c.raw||0)*1000).toLocaleString()}`;
+      return ` ${c.dataset.label}: ${(c.raw||0).toLocaleString()}`;
+    }}}}}});
+    setEl('subIG', 'Views (÷1000) and interactions by trimester · T3 pending');
+  } else {
+    mkChart('chartIG','bar', labs,[
+      {label:'Views (÷1000)', data:[null,null,106], backgroundColor:'rgba(168,85,247,0.7)', borderRadius:6},
+      {label:'Interactions', data:[null,null,2842], backgroundColor:'rgba(168,85,247,0.3)', borderRadius:6},
+    ],{extra:{plugins:{tooltip:{callbacks:{label:(c)=>{
+      if(c.datasetIndex===0) return ` Views: ${((c.raw||0)*1000).toLocaleString()}`;
+      return ` ${c.dataset.label}: ${(c.raw||0).toLocaleString()}`;
+    }}}}}});
+    setEl('titleIG', 'Instagram — COH Main (2025 T3 Snapshot)');
+    setEl('subIG', 'T3 snapshot only — T1/T2 2025 data not available');
+  }
+
+  // ── Monday Connect chart ────────────────────────────────────────────────────
+  mkChart('chartMonConnect','bar', labs,[{
     label:'Monday Connect Sign-ups', data:[232,463,152],
     backgroundColor:['rgba(37,99,235,0.7)','rgba(16,185,129,0.7)','rgba(245,158,11,0.7)'], borderRadius:8
   }],{legend:false});
+
+  // ── Social cards grid ──────────────────────────────────────────────────────
+  const grid = document.getElementById('socialGrid');
+  if (!grid) return;
+  if (is26) {
+    const fmtT = (arr, i) => arr[i] != null ? arr[i].toLocaleString() : '—';
+    const trendStr = (arr) => {
+      let s = 'T1: ' + fmtT(arr,0) + ' → T2: ' + fmtT(arr,1);
+      if (arr[2] != null) s += ' → T3: ' + fmtT(arr,2);
+      return s;
+    };
+    const ytdSum = (arr) => arr.reduce((s,v)=>s+(v||0),0).toLocaleString();
+    grid.innerHTML = `
+      <div class="social-card">
+        <div class="social-platform">📘 Facebook — COH Main (2026)</div>
+        <div class="social-metric"><span class="social-metric-name">Views</span><span style="font-size:10px;color:#94a3b8">${trendStr(COMMS_26.fbViews)}</span></div>
+        <div class="social-metric"><span class="social-metric-name">New Followers</span><span style="font-size:10px;color:#94a3b8">${trendStr(COMMS_26.fbFollowers)}</span></div>
+        <div class="social-metric"><span class="social-metric-name">Reactions</span><span style="font-size:10px;color:#94a3b8">${trendStr(COMMS_26.fbReactions)}</span></div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">▶️ YouTube — COH Main (2026)</div>
+        <div class="social-metric"><span class="social-metric-name">Total Views YTD</span><span class="social-metric-value">${ytdSum(COMMS_26.ytViews)}</span></div>
+        <div class="social-metric"><span class="social-metric-name">New Subscribers</span><span style="font-size:10px;color:#94a3b8">${trendStr(COMMS_26.ytSubs)}</span></div>
+        <div class="social-metric"><span class="social-metric-name">Video Impressions</span><span style="font-size:10px;color:#94a3b8">${trendStr(COMMS_26.ytImpressions)}</span></div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">📷 Instagram — COH Main (2026)</div>
+        <div class="social-metric"><span class="social-metric-name">New Followers</span><span style="font-size:10px;color:#94a3b8">${trendStr(COMMS_26.igFollowers)}</span></div>
+        <div class="social-metric"><span class="social-metric-name">Views</span><span style="font-size:10px;color:#94a3b8">${trendStr(COMMS_26.igViews)}</span></div>
+        <div class="social-metric"><span class="social-metric-name">Interactions</span><span style="font-size:10px;color:#94a3b8">${trendStr(COMMS_26.igInteractions)}</span></div>
+      </div>`;
+  } else {
+    grid.innerHTML = `
+      <div class="social-card">
+        <div class="social-platform">📘 Facebook (2025 Annual)</div>
+        <div class="social-metric"><span class="social-metric-name">Views</span><span style="font-size:10px;color:#94a3b8">T1: 65,667 → T2: 90,238 → T3: 67,963</span></div>
+        <div class="social-metric"><span class="social-metric-name">New Followers</span><span style="font-size:10px;color:#94a3b8">T1: 31 → T2: 60 → T3: 74</span></div>
+        <div class="social-metric"><span class="social-metric-name">Reactions</span><span style="font-size:10px;color:#94a3b8">T1: 653 → T2: 1,171 → T3: 2,192</span></div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">▶️ YouTube — COH Main (2025 Annual)</div>
+        <div class="social-metric"><span class="social-metric-name">Total Views</span><span class="social-metric-value">33,500</span></div>
+        <div class="social-metric"><span class="social-metric-name">Hours Watched</span><span class="social-metric-value">10,200</span></div>
+        <div class="social-metric"><span class="social-metric-name">New Subscribers</span><span class="social-metric-value">1,187</span></div>
+        <div class="social-metric" style="margin-top:8px; padding-top:8px; border-top:1px solid #e2e8f0;">
+          <span class="social-metric-name" style="font-style:italic; color:#64748b;">Quarterly trend</span>
+          <span style="font-size:10px;color:#94a3b8">T1: 7,300 → T2: 7,900 → T3: 8,900</span>
+        </div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">🟥 YouTube — Celebrate Recovery (2025)</div>
+        <div class="social-metric"><span class="social-metric-name">Total Views</span><span class="social-metric-value">53,764</span></div>
+        <div class="social-metric"><span class="social-metric-name">New Subscribers</span><span class="social-metric-value">412</span></div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">📷 Instagram — COH Main (2025 Annual)</div>
+        <div class="social-metric"><span class="social-metric-name">Followers</span><span class="social-metric-value">2,650</span></div>
+        <div class="social-metric"><span class="social-metric-name">YoY Follower Growth</span><span class="social-metric-value">+10%</span></div>
+        <div class="social-metric" style="margin-top:8px; padding-top:8px; border-top:1px solid #e2e8f0;">
+          <span class="social-metric-name" style="font-style:italic; color:#64748b;">T3 snapshot</span>
+        </div>
+        <div class="social-metric"><span class="social-metric-name">T3 Views</span><span class="social-metric-value">105,855</span></div>
+        <div class="social-metric"><span class="social-metric-name">T3 Interactions</span><span class="social-metric-value">2,842</span></div>
+      </div>
+      <div class="social-card">
+        <div class="social-platform">📱 COH Mobile App (2025)</div>
+        <div class="social-metric"><span class="social-metric-name">New Downloads</span><span class="social-metric-value">419</span></div>
+        <div class="social-metric"><span class="social-metric-name">Church Online Hours</span><span class="social-metric-value">445.3</span></div>
+      </div>`;
+  }
 }
 
 // ═══════════════════════════ NAV ════════════════════════════════════════════
@@ -1220,6 +1478,7 @@ function setYear(y) {
   if (document.getElementById('page-attendance')?.classList.contains('active')) renderAttendanceCharts();
   if (document.getElementById('page-giving')?.classList.contains('active'))     renderGivingCharts();
   if (document.getElementById('page-maps')?.classList.contains('active'))       renderMAPSCharts();
+  if (document.getElementById('page-digital')?.classList.contains('active'))    renderDigitalCharts();
 }
 
 // ═══════════════════════════ INIT ════════════════════════════════════════════
